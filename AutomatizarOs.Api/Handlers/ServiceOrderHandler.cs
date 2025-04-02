@@ -4,11 +4,11 @@ using AutomatizarOs.Core.Handlers;
 using AutomatizarOs.Core.Models;
 using AutomatizarOs.Core.Responses;
 using Dapper;
+using Microsoft.EntityFrameworkCore;
 
 public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHandler
 {
     private static readonly string ConnectionString = @"Driver={Microsoft Access Driver (*.mdb, *.accdb)};Dbq=C:\sisos\os.mdb;";
-    private ServiceOrder LastServiceOrder { get; set; } = new();
 
     public async Task<Response<IEnumerable<ServiceOrder>>> GetLocalServiceOrder()
     {
@@ -33,9 +33,9 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
             var serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
 
             var latestOrder = serviceOrders.FirstOrDefault();
-            if (latestOrder != null && LastServiceOrder.Id != latestOrder.Id)
+            
+            if (latestOrder != null && !await context.ServiceOrders.AnyAsync(x => x.Id == latestOrder.Id))
             {
-                LastServiceOrder = latestOrder;
                 await context.ServiceOrders.AddAsync(latestOrder);
                 await context.SaveChangesAsync();
             }
