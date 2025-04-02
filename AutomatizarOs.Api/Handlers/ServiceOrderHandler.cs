@@ -12,6 +12,7 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
 
     public async Task<Response<IEnumerable<ServiceOrder>>> GetLocalServiceOrder()
     {
+        Console.WriteLine("Rodando a query");
         try
         {
             await using var connection = new OdbcConnection(ConnectionString);
