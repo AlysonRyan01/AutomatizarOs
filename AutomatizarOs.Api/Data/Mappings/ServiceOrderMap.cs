@@ -15,31 +15,26 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
         builder.Property(so => so.Id)
             .HasColumnName("Id")
             .ValueGeneratedOnAdd();
-        
+
         builder.Property(so => so.EServiceOrderStatus)
             .HasColumnName("ServiceOrderStatus")
-            .HasConversion<string>()
-            .HasMaxLength(20);
+            .HasColumnType("INT");
             
         builder.Property(so => so.EEnterprise)
             .HasColumnName("Enterprise")
-            .HasConversion<string>()
-            .HasMaxLength(20);
+            .HasColumnType("INT");
             
         builder.Property(so => so.ProductType)
             .HasColumnName("ProductType")
-            .HasConversion<string>()
-            .HasMaxLength(50);
+            .HasColumnType("INT");
             
         builder.Property(so => so.ERepair)
             .HasColumnName("RepairStatus")
-            .HasConversion<string>()
-            .HasMaxLength(20);
+            .HasColumnType("INT");
             
         builder.Property(so => so.EUnrepaired)
             .HasColumnName("UnrepairedStatus")
-            .HasConversion<string>()
-            .HasMaxLength(20);
+            .HasColumnType("INT");
             
         builder.Property(so => so.ProductBrand)
             .HasColumnName("ProductBrand")
@@ -63,9 +58,8 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
             
         builder.Property(so => so.Amount)
             .HasColumnName("Amount")
-            .HasColumnType("decimal(18,2)");
-
-        // Mapeamento das datas
+            .HasColumnType("MONEY");
+        
         builder.Property(so => so.EntryDate)
             .HasColumnName("EntryDate")
             .HasColumnType("datetime");
