@@ -35,22 +35,60 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
                                 FROM os 
                                 ORDER BY os_codigo DESC";
 
-            var serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
+            List<ServiceOrder> serviceOrders;
+            
+            try
+            {
+                serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
+            }
+            catch (OleDbException ex) when (ex.ErrorCode == -2147217871)
+            {
+                Console.WriteLine($"Erro na query SQL: {ex.Message}");
+                return new Response<ServiceOrder>(null, 500, "Erro na consulta ao banco de dados");
+            }
+            catch (OleDbException ex)
+            {
+                Console.WriteLine($"Erro no banco Access: {ex.Message}");
+                return new Response<ServiceOrder>(null, 500, "Erro ao acessar o banco de dados");
+            }
+            catch (InvalidCastException ex)
+            {
+                Console.WriteLine($"Erro de conversão de tipos: {ex.Message}");
+                return new Response<ServiceOrder>(null, 500, "Erro no formato dos dados");
+            }
 
             var latestOrder = serviceOrders.FirstOrDefault();
             
-            if (latestOrder != null && !await context.ServiceOrders.AnyAsync(x => x.Id == latestOrder.Id))
+            if (latestOrder != null)
             {
-                await context.ServiceOrders.AddAsync(latestOrder);
-                await context.SaveChangesAsync();
+                try
+                {
+                    if (!await context.ServiceOrders.AnyAsync(x => x.Id == latestOrder.Id))
+                    {
+                        await context.ServiceOrders.AddAsync(latestOrder);
+                        await context.SaveChangesAsync();
+                    }
+                }
+                catch (DbUpdateException ex)
+                {
+                    Console.WriteLine($"Erro ao salvar no banco principal: {ex.Message}");
+                    return new Response<ServiceOrder>(latestOrder, 207, 
+                        "Ordem recuperada do Access, mas não foi possível salvar no banco principal");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    Console.WriteLine($"Erro no contexto do EF: {ex.Message}");
+                    return new Response<ServiceOrder>(latestOrder, 207, 
+                        "Ordem recuperada do Access, mas ocorreu um erro no sistema");
+                }
             }
 
             return new Response<ServiceOrder>(latestOrder);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erro: {ex.Message}");
-            throw;
+            Console.WriteLine($"Erro inesperado: {ex.Message}");
+            return new Response<ServiceOrder>(null, 500, "Erro interno no servidor");
         }
     }
 
