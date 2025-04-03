@@ -1,8 +1,8 @@
 using AutomatizarOs.Api;
 using AutomatizarOs.Api.Common;
+using AutomatizarOs.Api.Handlers;
 using AutomatizarOs.Api.Services;
 using AutomatizarOs.Core.Handlers;
-using AutomatizarOs.Core.Models;
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,12 +19,18 @@ builder.AddControllers();
 
 builder.Services.AddQuartz(q =>
 {
-    q.UseSimpleTypeLoader(); // Opcional, mas recomendado
-    q.UseInMemoryStore();    // Pode ser substituído por um banco de dados, se necessário
-
-    // Registrar o Job e o Trigger
-    q.ScheduleJob<ServiceOrderJob>(trigger => trigger
+    q.UseSimpleTypeLoader();
+    q.UseInMemoryStore();
+    
+    var jobKey = new JobKey("ServiceOrderSyncJob");
+    q.AddJob<ServiceOrderJob>(jobKey, j => j
+        .StoreDurably()
+        .WithDescription("Job de sincronização de ordens de serviço")
+    );
+    
+    q.AddTrigger(t => t
         .WithIdentity("ServiceOrderTrigger")
+        .ForJob(jobKey)
         .StartNow()
         .WithSimpleSchedule(x => x
             .WithIntervalInSeconds(30)
@@ -32,10 +38,12 @@ builder.Services.AddQuartz(q =>
     );
 });
 
-// Adicionar o Quartz Hosted Service
-builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+builder.Services.AddQuartzHostedService(q => 
+{
+    q.WaitForJobsToComplete = true;
+    q.StartDelay = TimeSpan.FromSeconds(5);
+});
 
-// Registrar o Job
 builder.Services.AddScoped<ServiceOrderJob>();
 
 var app = builder.Build();
