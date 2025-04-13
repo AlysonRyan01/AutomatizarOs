@@ -1,10 +1,9 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using AutomatizarOs.Core.Enums;
 using Dapper.Contrib.Extensions;
 
 namespace AutomatizarOs.Core.Models;
 
-[Dapper.Contrib.Extensions.Table("os")]
+[Table("os")]
 public class ServiceOrder
 {
     [Key]
@@ -16,10 +15,10 @@ public class ServiceOrder
     
     public EProduct ProductType { get; set; }
     
-    public string ProductBrand { get; set; }
-    public string ProductModel { get; set; }
-    public string ProductSerialNumber { get; set; }
-    public string ProductDefect { get; set; }
+    public string ProductBrand { get; set; } = string.Empty;
+    public string ProductModel { get; set; } = string.Empty;
+    public string ProductSerialNumber { get; set; } = string.Empty;
+    public string ProductDefect { get; set; } = string.Empty;
     public string? Solution { get; set; }
     public decimal? Amount { get; set; }
     

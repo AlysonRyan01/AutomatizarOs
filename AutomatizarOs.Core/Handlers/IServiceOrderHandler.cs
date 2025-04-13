@@ -6,7 +6,7 @@ namespace AutomatizarOs.Core.Handlers;
 
 public interface IServiceOrderHandler
 {
-    Task<Response<ServiceOrder>> GetLocalServiceOrder();
+    Task<Response<bool?>> GetLocalServiceOrder();
     Task<Response<List<ServiceOrder>>> GetAllServiceOrder();
     Task<Response<ServiceOrder>> AddQuoteById(AddQuoteRequest request);
     Task<Response<ServiceOrder>> AddRepairById(long id);

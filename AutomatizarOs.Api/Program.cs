@@ -1,6 +1,7 @@
 using AutomatizarOs.Api;
 using AutomatizarOs.Api.Common;
 using AutomatizarOs.Api.Handlers;
+using AutomatizarOs.Api.Hubs;
 using AutomatizarOs.Api.Services;
 using AutomatizarOs.Core.Handlers;
 using Quartz;
@@ -10,12 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddConfigurationApiUrl();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IServiceOrderHandler, ServiceOrderHandler>();
+builder.Services.AddScoped<ICustomerHandler, CustomerHandler>();
 builder.AddCorsConfiguration();
 builder.AddJwtConfiguration();
 builder.AddSwaggerGen();
 builder.AddIdentity();
 builder.AddDbConfiguration();
 builder.AddControllers();
+builder.Services.AddSignalR();
 
 builder.Services.AddQuartz(q =>
 {
@@ -50,6 +53,7 @@ var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHub<OrdemDeServicoHub>("/osHub");
 
 app.UseCors(ApiConfiguration.CorsPolicyName);
 

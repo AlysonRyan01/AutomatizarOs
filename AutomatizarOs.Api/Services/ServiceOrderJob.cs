@@ -1,4 +1,6 @@
+using AutomatizarOs.Api.Hubs;
 using AutomatizarOs.Core.Handlers;
+using Microsoft.AspNetCore.SignalR;
 using Quartz;
 
 namespace AutomatizarOs.Api.Services;
@@ -6,18 +8,34 @@ namespace AutomatizarOs.Api.Services;
 public class ServiceOrderJob : IJob
 {
     private readonly IServiceOrderHandler _serviceOrderHandler;
+    private readonly ICustomerHandler _customerHandler;
     private readonly ILogger<ServiceOrderJob> _logger;
+    private readonly IHubContext<OrdemDeServicoHub> _hubContext;
     
-    public ServiceOrderJob(IServiceOrderHandler serviceOrderHandler, ILogger<ServiceOrderJob> logger)
+    public ServiceOrderJob(IServiceOrderHandler serviceOrderHandler, ILogger<ServiceOrderJob> logger, IHubContext<OrdemDeServicoHub> hubContext, ICustomerHandler customerHandler)
     {
         _serviceOrderHandler = serviceOrderHandler;
         _logger = logger;
+        _hubContext = hubContext;
+        _customerHandler = customerHandler;
     }
 
     public async Task Execute(IJobExecutionContext context)
     {
         try
         {
+            var newCustomer = await _customerHandler.GetLocalCustomers();
+            
+            if (!newCustomer.IsSuccess)
+            {
+                _logger.LogWarning("Falha ao buscar novas ordens: {Message}", 
+                    newCustomer.Message);
+            }
+            else
+            {
+                _logger.LogInformation("Nova ordem sincronizada!");
+            }
+            
             var newOrderResponse = await _serviceOrderHandler.GetLocalServiceOrder();
             
             if (!newOrderResponse.IsSuccess)
@@ -27,17 +45,12 @@ public class ServiceOrderJob : IJob
             }
             else if (newOrderResponse.Data != null)
             {
-                _logger.LogInformation("Nova ordem sincronizada: ID {OrderId}", 
-                    newOrderResponse.Data.Id);
+                if (newOrderResponse.Data!.Value) // == true
+                    await _hubContext.Clients.All.SendAsync("NovaOSRecebida", newOrderResponse.Message);
+                
+                _logger.LogInformation("Nova ordem sincronizada!");
             }
             
-            var allOrdersResponse = await _serviceOrderHandler.GetAllServiceOrder();
-            
-            if (!allOrdersResponse.IsSuccess)
-            {
-                _logger.LogError("Falha ao atualizar lista completa: {Message}", 
-                    allOrdersResponse.Message);
-            }
         }
         catch (Exception ex)
         {
