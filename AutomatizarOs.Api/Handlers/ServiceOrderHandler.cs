@@ -3,64 +3,39 @@ using AutomatizarOs.Api.Data;
 using AutomatizarOs.Core.Enums;
 using AutomatizarOs.Core.Handlers;
 using AutomatizarOs.Core.Models;
+using AutomatizarOs.Core.Repositories;
 using AutomatizarOs.Core.Requests.ServiceOrderRequests;
 using AutomatizarOs.Core.Responses;
-using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace AutomatizarOs.Api.Handlers;
 
-public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHandler
+public class ServiceOrderHandler : IServiceOrderHandler
 {
+    private readonly AutomatizarDbContext _context;
+    private readonly IServiceOrderRepository _serviceOrderRepository;
     private static readonly string ConnectionString = @"Provider=Microsoft.ACE.OLEDB.16.0;Data Source=C:\sisos\os.mdb;";
+
+    public ServiceOrderHandler(AutomatizarDbContext context, IServiceOrderRepository serviceOrderRepository)
+    {
+        _context = context;
+        _serviceOrderRepository = serviceOrderRepository;
+    }
 
     public async Task<Response<bool?>> GetLocalServiceOrder()
     {
         Console.WriteLine("Rodando a query");
-        using var transaction = await context.Database.BeginTransactionAsync();
+        using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            using var connection = new OleDbConnection(ConnectionString);
-            connection.Open();
+            var serviceOrders = await _serviceOrderRepository.GetActiveServiceOrders();
 
-            const string query = @"SELECT TOP 10 os_codigo AS Id, os_situacao AS eServiceOrderStatus, 
-                                emp_codigo AS eEnterprise, pro_codigo AS productType, 
-                                os_marca AS productBrand, os_modelo AS productModel, 
-                                os_ns AS productSerialNumber, os_defeito AS productDefect, 
-                                os_solucao AS solution, os_valor AS amount, os_data_entrada AS entryDate, 
-                                os_data_vistoria AS inspectionDate, os_data_concerto AS repairDate, 
-                                os_data_entrega AS deliveryDate, cli_codigo AS customerId, 
-                                os_concerto AS eRepair, os_semconserto AS eUnrepaired, 
-                                os_valpeca AS partCost, os_valmo AS laborCost 
-                                FROM os 
-                                ORDER BY os_codigo DESC";
-
-            List<ServiceOrder> serviceOrders;
-            
-            try
-            {
-                serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
-            }
-            catch (OleDbException ex) when (ex.ErrorCode == -2147217871)
-            {
-                Console.WriteLine($"Erro na query SQL: {ex.Message}");
-                return new Response<bool?>(null, 500, "Erro na consulta ao banco de dados");
-            }
-            catch (OleDbException ex)
-            {
-                Console.WriteLine($"Erro no banco Access: {ex.Message}");
-                return new Response<bool?>(null, 500, "Erro ao acessar o banco de dados");
-            }
-            catch (InvalidCastException ex)
-            {
-                Console.WriteLine($"Erro de conversão de tipos: {ex.Message}");
-                return new Response<bool?>(null, 500, "Erro no formato dos dados");
-            }
+            if (!serviceOrders.Any())
+                return new Response<bool?>(null, 500, "Erro ao obter as ordens de servico do access");
 
             var serviceOrdersIds = serviceOrders.Select(c => c.Id).ToList();
 
-            var existingIds = await context.ServiceOrders
+            var existingIds = await _context.ServiceOrders
                 .Where(c => serviceOrdersIds.Contains(c.Id))
                 .Select(c => c.Id)
                 .ToListAsync();
@@ -69,8 +44,8 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
 
             if (newServiceOrders.Any())
             {
-                context.ServiceOrders.AddRange(newServiceOrders);
-                await context.SaveChangesAsync();
+                _context.ServiceOrders.AddRange(newServiceOrders);
+                await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return new Response<bool?>(true, 200, "Sucesso");
             }
@@ -89,32 +64,12 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
     {
         try
         {
-            var serviceOrders = await context.ServiceOrders.ToListAsync();
+            var serviceOrders = await _serviceOrderRepository.GetAllServiceOrdersFromCloud();
             
             if (!serviceOrders.Any())
                 return new Response<List<ServiceOrder>>(null, 404, "Nenhuma ordem de servico foi encontrada");
             
             return new Response<List<ServiceOrder>>(serviceOrders);
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.WriteLine($"Operação inválida no DbContext: {ex.Message}");
-            return new Response<List<ServiceOrder>>(null, 500, "Erro interno: contexto de banco de dados inválido");
-        }
-        catch (DbUpdateException ex)
-        {
-            Console.WriteLine($"Erro ao consultar o banco de dados: {ex.Message}");
-            return new Response<List<ServiceOrder>>(null, 500, "Erro ao acessar o banco de dados");
-        }
-        catch (SqlException ex) when (ex.Number == -2)
-        {
-            Console.WriteLine($"Timeout na consulta: {ex.Message}");
-            return new Response<List<ServiceOrder>>(null, 504, "Tempo excedido ao buscar ordens de serviço");
-        }
-        catch (SqlException ex)
-        {
-            Console.WriteLine($"Erro específico do SQL Server: {ex.Message}");
-            return new Response<List<ServiceOrder>>(null, 500, "Erro no banco de dados");
         }
         catch (Exception ex)
         {
@@ -127,7 +82,7 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
     {
         try
         {
-            var serviceOrder = await context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var serviceOrder = await _serviceOrderRepository.GetServiceOrderById(request.Id);
             
             if (serviceOrder == null)
                 return new Response<ServiceOrder>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
@@ -154,56 +109,16 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
                     serviceOrder.EUnrepaired = EUnrepaired.Repair;
                     break;
             }
-            
-            context.ServiceOrders.Update(serviceOrder);
-            await context.SaveChangesAsync();
-            
-            const string accessQuery = @"
-                UPDATE [os] 
-                SET 
-                    [os_situacao] = ?,
-                    [os_solucao] = ?,
-                    [os_valor] = ?,
-                    [os_data_vistoria] = ?,
-                    [os_concerto] = ?,
-                    [os_semconserto] = ?,
-                    [os_valmo] = ?
-                WHERE 
-                    [os_codigo] = ?";
 
-            await using var connection = new OleDbConnection(ConnectionString);
-            await connection.OpenAsync();
-            
-            await using var command = new OleDbCommand(accessQuery, connection);
-            command.CommandTimeout = 30;
-            
-            command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer) { Value = (int)serviceOrder.EServiceOrderStatus });
-            command.Parameters.Add(new OleDbParameter("@p2", OleDbType.VarChar) { Value = serviceOrder.Solution ?? string.Empty });
-            command.Parameters.Add(new OleDbParameter("@p3", OleDbType.Currency) { Value = serviceOrder.Amount });
-            command.Parameters.Add(new OleDbParameter("@p4", OleDbType.Date) { Value = serviceOrder.InspectionDate ?? DateTime.Now });
-            command.Parameters.Add(new OleDbParameter("@p5", OleDbType.Integer) { Value = (int)serviceOrder.ERepair });
-            command.Parameters.Add(new OleDbParameter("@p6", OleDbType.Integer) { Value = (int)serviceOrder.EUnrepaired });
-            command.Parameters.Add(new OleDbParameter("@p7", OleDbType.Currency) { Value = serviceOrder.Amount ?? 0m });
-            command.Parameters.Add(new OleDbParameter("@p8", OleDbType.Integer) { Value = serviceOrder.Id });
-            
-            await command.ExecuteNonQueryAsync();
+            var cloudUpdateResult = await _serviceOrderRepository.UpdateCloudServiceOrder(serviceOrder);
+            if (cloudUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico na nuvem");
+
+            var localUpdateResult = await _serviceOrderRepository.UpdateLocalServiceOrder(serviceOrder);
+            if (localUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico localmente");
 
             return new Response<ServiceOrder>(serviceOrder, 200, "Sucesso ao atualizar a ordem de serviço");
-        }
-        catch (OleDbException ex) when (ex.ErrorCode == -2147217900)
-        {
-            Console.WriteLine($"Erro de sintaxe SQL: {ex.Message}");
-            return new Response<ServiceOrder>(null, 400, "Erro na sintaxe do comando SQL");
-        }
-        catch (OleDbException ex)
-        {
-            Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao acessar o banco de dados Access");
-        }
-        catch (DbUpdateException ex)
-        {
-            Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao salvar no banco de dados principal");
         }
         catch (Exception ex)
         {
@@ -216,9 +131,7 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
     {
         try
         {
-            var serviceOrder = await context
-                .ServiceOrders
-                .FirstOrDefaultAsync(x => x.Id == id && x.EServiceOrderStatus == EServiceOrderStatus.Evaluated);
+            var serviceOrder = await _serviceOrderRepository.GetEvaluetedServiceOrderById(id);
             
             if (serviceOrder == null)
                 return new Response<ServiceOrder>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
@@ -226,8 +139,9 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
             serviceOrder.EServiceOrderStatus = EServiceOrderStatus.Repaired;
             serviceOrder.RepairDate = DateTime.Now;
             
-            context.ServiceOrders.Update(serviceOrder);
-            await context.SaveChangesAsync();
+            var cloudUpdateResult = await _serviceOrderRepository.UpdateCloudServiceOrder(serviceOrder);
+            if (cloudUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico na nuvem");
             
             const string accessQuery = @"
             UPDATE [os] 
@@ -278,7 +192,7 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
     {
         try
         {
-            var serviceOrder = await context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == id);
+            var serviceOrder = await _context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == id);
             
             if (serviceOrder == null)
                 return new Response<ServiceOrder>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
@@ -314,8 +228,8 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
                 await command.ExecuteNonQueryAsync();
             }
             
-            context.ServiceOrders.Remove(serviceOrder);
-            await context.SaveChangesAsync();
+            _context.ServiceOrders.Remove(serviceOrder);
+            await _context.SaveChangesAsync();
 
             return new Response<ServiceOrder>(serviceOrder, 200, "Ordem de serviço marcada como entregue e removida localmente");
         }
@@ -340,15 +254,15 @@ public class ServiceOrderHandler(AutomatizarDbContext context) : IServiceOrderHa
     {
         try
         {
-            var serviceOrder = await context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var serviceOrder = await _context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == request.Id);
             
             if (serviceOrder == null)
                 return new Response<ServiceOrder>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
             
             serviceOrder.ERepair = request.Repair;
             
-            context.ServiceOrders.Update(serviceOrder);
-            await context.SaveChangesAsync();
+            _context.ServiceOrders.Update(serviceOrder);
+            await _context.SaveChangesAsync();
             
             const string accessQuery = @"
             UPDATE [os] 

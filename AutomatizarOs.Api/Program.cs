@@ -2,8 +2,10 @@ using AutomatizarOs.Api;
 using AutomatizarOs.Api.Common;
 using AutomatizarOs.Api.Handlers;
 using AutomatizarOs.Api.Hubs;
+using AutomatizarOs.Api.Repositories;
 using AutomatizarOs.Api.Services;
 using AutomatizarOs.Core.Handlers;
+using AutomatizarOs.Core.Repositories;
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,7 @@ builder.AddConfigurationApiUrl();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IServiceOrderHandler, ServiceOrderHandler>();
 builder.Services.AddScoped<ICustomerHandler, CustomerHandler>();
+builder.Services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
 builder.AddCorsConfiguration();
 builder.AddJwtConfiguration();
 builder.AddSwaggerGen();
