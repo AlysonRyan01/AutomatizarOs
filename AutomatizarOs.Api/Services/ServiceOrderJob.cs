@@ -45,7 +45,7 @@ public class ServiceOrderJob : IJob
             }
             else if (newOrderResponse.Data != null)
             {
-                if (newOrderResponse.Data!.Value) // == true
+                if (newOrderResponse.Data!.Value)
                     await _hubContext.Clients.All.SendAsync("NovaOSRecebida", newOrderResponse.Message);
                 
                 _logger.LogInformation("Nova ordem sincronizada!");

@@ -1,4 +1,3 @@
-using System.Data.OleDb;
 using AutomatizarOs.Api.Data;
 using AutomatizarOs.Core.Enums;
 using AutomatizarOs.Core.Handlers;
@@ -14,7 +13,6 @@ public class ServiceOrderHandler : IServiceOrderHandler
 {
     private readonly AutomatizarDbContext _context;
     private readonly IServiceOrderRepository _serviceOrderRepository;
-    private static readonly string ConnectionString = @"Provider=Microsoft.ACE.OLEDB.16.0;Data Source=C:\sisos\os.mdb;";
 
     public ServiceOrderHandler(AutomatizarDbContext context, IServiceOrderRepository serviceOrderRepository)
     {
@@ -142,44 +140,12 @@ public class ServiceOrderHandler : IServiceOrderHandler
             var cloudUpdateResult = await _serviceOrderRepository.UpdateCloudServiceOrder(serviceOrder);
             if (cloudUpdateResult == false)
                 return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico na nuvem");
-            
-            const string accessQuery = @"
-            UPDATE [os] 
-            SET 
-                [os_situacao] = ?,
-                [os_data_concerto] = ?
-            WHERE 
-                [os_codigo] = ?";
 
-            await using var connection = new OleDbConnection(ConnectionString);
-            await connection.OpenAsync();
-        
-            await using var command = new OleDbCommand(accessQuery, connection);
-            command.CommandTimeout = 30;
+            var localUpdateResult = await _serviceOrderRepository.UpdateLocalServiceOrderBasic(serviceOrder);
+            if (localUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico localmente");
             
-            command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer) { 
-                Value = (int)serviceOrder.EServiceOrderStatus 
-            });
-            command.Parameters.Add(new OleDbParameter("@p2", OleDbType.Date) { 
-                Value = serviceOrder.RepairDate 
-            });
-            command.Parameters.Add(new OleDbParameter("@p3", OleDbType.Integer) { 
-                Value = serviceOrder.Id 
-            });
-        
-            await command.ExecuteNonQueryAsync();
-
             return new Response<ServiceOrder>(serviceOrder, 200, "Ordem de serviço marcada como reparada com sucesso");
-        }
-        catch (OleDbException ex)
-        {
-            Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao atualizar status no banco de dados Access");
-        }
-        catch (DbUpdateException ex)
-        {
-            Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao atualizar status no banco de dados principal");
         }
         catch (Exception ex)
         {
@@ -192,7 +158,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
     {
         try
         {
-            var serviceOrder = await _context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == id);
+            var serviceOrder = await _serviceOrderRepository.GetServiceOrderById(id);
             
             if (serviceOrder == null)
                 return new Response<ServiceOrder>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
@@ -200,48 +166,13 @@ public class ServiceOrderHandler : IServiceOrderHandler
             serviceOrder.EServiceOrderStatus = EServiceOrderStatus.Delivered;
             serviceOrder.DeliveryDate = DateTime.Now;
             
-            const string accessQuery = @"
-            UPDATE [os] 
-            SET 
-                [os_situacao] = ?,
-                [os_data_entrega] = ?
-            WHERE 
-                [os_codigo] = ?";
+            var localUpdateResult = await _serviceOrderRepository.UpdateDeliveryLocalServiceOrder(serviceOrder);
+            if (localUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico localmente");
 
-            await using (var connection = new OleDbConnection(ConnectionString))
-            {
-                await connection.OpenAsync();
-            
-                await using var command = new OleDbCommand(accessQuery, connection);
-                command.CommandTimeout = 30;
-            
-                command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer) { 
-                    Value = (int)serviceOrder.EServiceOrderStatus 
-                });
-                command.Parameters.Add(new OleDbParameter("@p2", OleDbType.Date) { 
-                    Value = serviceOrder.DeliveryDate 
-                });
-                command.Parameters.Add(new OleDbParameter("@p3", OleDbType.Integer) { 
-                    Value = serviceOrder.Id 
-                });
-            
-                await command.ExecuteNonQueryAsync();
-            }
-            
-            _context.ServiceOrders.Remove(serviceOrder);
-            await _context.SaveChangesAsync();
+            var removeServiceOrderResult = await _serviceOrderRepository.RemoveCloudServiceOrder(serviceOrder);
 
             return new Response<ServiceOrder>(serviceOrder, 200, "Ordem de serviço marcada como entregue e removida localmente");
-        }
-        catch (OleDbException ex)
-        {
-            Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao atualizar status no banco de dados Access");
-        }
-        catch (DbUpdateException ex)
-        {
-            Console.WriteLine($"Erro ao remover no Entity Framework: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao remover ordem de serviço");
         }
         catch (Exception ex)
         {
@@ -254,45 +185,20 @@ public class ServiceOrderHandler : IServiceOrderHandler
     {
         try
         {
-            var serviceOrder = await _context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var serviceOrder = await _serviceOrderRepository.GetServiceOrderById(request.Id);
             
             if (serviceOrder == null)
                 return new Response<ServiceOrder>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
             
             serviceOrder.ERepair = request.Repair;
-            
-            _context.ServiceOrders.Update(serviceOrder);
-            await _context.SaveChangesAsync();
-            
-            const string accessQuery = @"
-            UPDATE [os] 
-            SET 
-                [os_concerto] = ?
-            WHERE 
-                [os_codigo] = ?";
-            
-            await using var connection = new OleDbConnection(ConnectionString);
-            await connection.OpenAsync();
-            
-            await using var command = new OleDbCommand(accessQuery, connection);
-            command.CommandTimeout = 30;
-            
-            command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer) { Value = (int)serviceOrder.ERepair });
-            command.Parameters.Add(new OleDbParameter("@p2", OleDbType.Integer) { Value = serviceOrder.Id });
-        
-            await command.ExecuteNonQueryAsync();
+
+            var cloudUpdateResult = await _serviceOrderRepository.UpdateCloudServiceOrder(serviceOrder);
+
+            var updateStatusResult = await _serviceOrderRepository.UpdateStatusLocalServiceOrder(serviceOrder);
+            if (updateStatusResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico localmente");
 
             return new Response<ServiceOrder>(serviceOrder, 200, "Status atualizado com sucesso");
-        }
-        catch (OleDbException ex)
-        {
-            Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao atualizar status no banco de dados Access");
-        }
-        catch (DbUpdateException ex)
-        {
-            Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
-            return new Response<ServiceOrder>(null, 500, "Erro ao atualizar status no banco de dados principal");
         }
         catch (Exception ex)
         {

@@ -10,5 +10,9 @@ namespace AutomatizarOs.Core.Repositories
         Task<bool> UpdateCloudServiceOrder(ServiceOrder serviceOrder);
         Task<bool> UpdateLocalServiceOrder(ServiceOrder serviceOrder);
         Task<ServiceOrder?> GetEvaluetedServiceOrderById(long id);
+        Task<bool> UpdateLocalServiceOrderBasic(ServiceOrder serviceOrder);
+        Task<bool> UpdateDeliveryLocalServiceOrder(ServiceOrder serviceOrder);
+        Task<bool> RemoveCloudServiceOrder(ServiceOrder serviceOrder);
+        Task<bool> UpdateStatusLocalServiceOrder(ServiceOrder serviceOrder);
     }
 }

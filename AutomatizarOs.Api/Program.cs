@@ -15,6 +15,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IServiceOrderHandler, ServiceOrderHandler>();
 builder.Services.AddScoped<ICustomerHandler, CustomerHandler>();
 builder.Services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.AddCorsConfiguration();
 builder.AddJwtConfiguration();
 builder.AddSwaggerGen();

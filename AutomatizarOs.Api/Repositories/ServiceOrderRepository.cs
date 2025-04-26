@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Data.OleDb;
 using AutomatizarOs.Api.Data;
 using AutomatizarOs.Core.Enums;
@@ -36,7 +37,7 @@ namespace AutomatizarOs.Api.Repositories
                                     os_concerto AS eRepair, os_semconserto AS eUnrepaired, 
                                     os_valpeca AS partCost, os_valmo AS laborCost 
                                     FROM os 
-                                    WHERE os_situacao != 4
+                                    WHERE os_situacao <> 4
                                     ORDER BY os_codigo DESC";
 
                 var serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
@@ -224,10 +225,184 @@ namespace AutomatizarOs.Api.Repositories
 
                 return serviceOrder;
             }
-            catch (System.Exception)
+            catch (DbException ex)
             {
+                Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex}");
+                return null;
+            }
+        }
 
-                throw;
+        public async Task<bool> UpdateLocalServiceOrderBasic(ServiceOrder serviceOrder)
+        {
+            try
+            {
+                const string accessQuery = @"
+                UPDATE [os] 
+                SET 
+                    [os_situacao] = ?,
+                    [os_data_concerto] = ?
+                WHERE 
+                    [os_codigo] = ?";
+
+                await using var connection = new OleDbConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                await using var command = new OleDbCommand(accessQuery, connection);
+                command.CommandTimeout = 30;
+
+                command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer)
+                {
+                    Value = (int)serviceOrder.EServiceOrderStatus
+                });
+                command.Parameters.Add(new OleDbParameter("@p2", OleDbType.Date)
+                {
+                    Value = serviceOrder.RepairDate
+                });
+                command.Parameters.Add(new OleDbParameter("@p3", OleDbType.Integer)
+                {
+                    Value = serviceOrder.Id
+                });
+
+                await command.ExecuteNonQueryAsync();
+                return true;
+
+            }
+            catch (OleDbException ex)
+            {
+                Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
+                return false;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateDeliveryLocalServiceOrder(ServiceOrder serviceOrder)
+        {
+            try
+            {
+                const string accessQuery = @"
+                UPDATE [os] 
+                SET 
+                    [os_situacao] = ?,
+                    [os_data_entrega] = ?
+                WHERE 
+                    [os_codigo] = ?";
+
+                await using var connection = new OleDbConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                await using var command = new OleDbCommand(accessQuery, connection);
+                command.CommandTimeout = 30;
+
+                command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer)
+                {
+                    Value = (int)serviceOrder.EServiceOrderStatus
+                });
+                command.Parameters.Add(new OleDbParameter("@p2", OleDbType.Date)
+                {
+                    Value = serviceOrder.DeliveryDate
+                });
+                command.Parameters.Add(new OleDbParameter("@p3", OleDbType.Integer)
+                {
+                    Value = serviceOrder.Id
+                });
+
+                await command.ExecuteNonQueryAsync();
+                return true;
+
+            }
+            catch (OleDbException ex)
+            {
+                Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
+                return false;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Erro ao remover no Entity Framework: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex}");
+                return false;
+            }
+        }
+
+        public async Task<bool> RemoveCloudServiceOrder(ServiceOrder serviceOrder)
+        {
+            try
+            {
+                _context.ServiceOrders.Remove(serviceOrder);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Erro ao remover no Entity Framework: {ex.Message}");
+                return false;
+            }
+            catch (DbException ex)
+            {
+                Console.WriteLine($"Erro ao remover no Entity Framework: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateStatusLocalServiceOrder(ServiceOrder serviceOrder)
+        {
+            try
+            {
+                const string accessQuery = @"
+                UPDATE [os] 
+                SET 
+                    [os_concerto] = ?
+                WHERE 
+                    [os_codigo] = ?";
+
+                await using var connection = new OleDbConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                await using var command = new OleDbCommand(accessQuery, connection);
+                command.CommandTimeout = 30;
+
+                command.Parameters.Add(new OleDbParameter("@p1", OleDbType.Integer) { Value = (int)serviceOrder.ERepair });
+                command.Parameters.Add(new OleDbParameter("@p2", OleDbType.Integer) { Value = serviceOrder.Id });
+
+                await command.ExecuteNonQueryAsync();
+                return true;
+            }
+            catch (OleDbException ex)
+            {
+                Console.WriteLine($"Erro de banco de dados Access: {ex.Message}");
+                return false;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex}");
+                return false;
             }
         }
     }
