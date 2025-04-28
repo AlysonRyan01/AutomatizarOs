@@ -341,31 +341,6 @@ namespace AutomatizarOs.Api.Repositories
             }
         }
 
-        public async Task<bool> RemoveCloudServiceOrder(ServiceOrder serviceOrder)
-        {
-            try
-            {
-                _context.ServiceOrders.Remove(serviceOrder);
-                await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (DbUpdateException ex)
-            {
-                Console.WriteLine($"Erro ao remover no Entity Framework: {ex.Message}");
-                return false;
-            }
-            catch (DbException ex)
-            {
-                Console.WriteLine($"Erro ao remover no Entity Framework: {ex.Message}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro inesperado: {ex}");
-                return false;
-            }
-        }
-
         public async Task<bool> UpdateStatusLocalServiceOrder(ServiceOrder serviceOrder)
         {
             try

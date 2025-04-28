@@ -170,9 +170,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
             if (localUpdateResult == false)
                 return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico localmente");
 
-            var removeServiceOrderResult = await _serviceOrderRepository.RemoveCloudServiceOrder(serviceOrder);
-
-            return new Response<ServiceOrder>(serviceOrder, 200, "Ordem de serviço marcada como entregue e removida localmente");
+            return new Response<ServiceOrder>(serviceOrder, 200, "Ordem de serviço marcada como entregue");
         }
         catch (Exception ex)
         {
