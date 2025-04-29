@@ -6,12 +6,16 @@ using AutomatizarOs.Api.Repositories;
 using AutomatizarOs.Api.Services;
 using AutomatizarOs.Core.Handlers;
 using AutomatizarOs.Core.Repositories;
+
 using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddTransient<JwtService>();
+
 builder.AddConfigurationApiUrl();
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IIdentityHandler, IdentityHandler>();
 builder.Services.AddScoped<IServiceOrderHandler, ServiceOrderHandler>();
 builder.Services.AddScoped<ICustomerHandler, CustomerHandler>();
 builder.Services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
