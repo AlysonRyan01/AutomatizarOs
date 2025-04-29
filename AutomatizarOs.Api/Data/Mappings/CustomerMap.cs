@@ -10,9 +10,9 @@ public class CustomerMap : IEntityTypeConfiguration<Customer>
     {
         builder.ToTable("Customers");
         
-        builder.HasKey(c => c.Id);
+        builder.HasKey(c => c.CustId);
         
-        builder.Property(c => c.Id)
+        builder.Property(c => c.CustId)
             .HasColumnName("Id")
             .ValueGeneratedNever();
         

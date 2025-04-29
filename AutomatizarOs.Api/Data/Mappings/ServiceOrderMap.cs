@@ -87,8 +87,8 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
         builder.Property(so => so.CustomerId)
             .HasColumnName("CustomerId");
             
-        builder.HasOne<Customer>()
-            .WithMany()
+        builder.HasOne(so => so.Customer)
+            .WithMany(c => c.ServiceOrders)
             .HasForeignKey(so => so.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
     }

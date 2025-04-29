@@ -3,6 +3,7 @@ using System;
 using AutomatizarOs.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutomatizarOs.Api.Migrations
 {
     [DbContext(typeof(AutomatizarDbContext))]
-    partial class AutomatizarDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250429213822_v3")]
+    partial class v3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.3");
@@ -84,7 +87,7 @@ namespace AutomatizarOs.Api.Migrations
 
             modelBuilder.Entity("AutomatizarOs.Core.Models.Customer", b =>
                 {
-                    b.Property<long>("CustId")
+                    b.Property<long>("Id")
                         .HasColumnType("INTEGER")
                         .HasColumnName("Id");
 
@@ -148,7 +151,7 @@ namespace AutomatizarOs.Api.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("ZipCode");
 
-                    b.HasKey("CustId");
+                    b.HasKey("Id");
 
                     b.ToTable("Customers", (string)null);
                 });
