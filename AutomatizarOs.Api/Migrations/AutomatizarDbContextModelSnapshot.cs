@@ -84,7 +84,7 @@ namespace AutomatizarOs.Api.Migrations
 
             modelBuilder.Entity("AutomatizarOs.Core.Models.Customer", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("CustId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("Id");
 
@@ -148,7 +148,7 @@ namespace AutomatizarOs.Api.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("ZipCode");
 
-                    b.HasKey("Id");
+                    b.HasKey("CustId");
 
                     b.ToTable("Customers", (string)null);
                 });
@@ -378,11 +378,13 @@ namespace AutomatizarOs.Api.Migrations
 
             modelBuilder.Entity("AutomatizarOs.Core.Models.ServiceOrder", b =>
                 {
-                    b.HasOne("AutomatizarOs.Core.Models.Customer", null)
-                        .WithMany()
+                    b.HasOne("AutomatizarOs.Core.Models.Customer", "Customer")
+                        .WithMany("ServiceOrders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<long>", b =>
@@ -419,6 +421,11 @@ namespace AutomatizarOs.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AutomatizarOs.Core.Models.Customer", b =>
+                {
+                    b.Navigation("ServiceOrders");
                 });
 #pragma warning restore 612, 618
         }

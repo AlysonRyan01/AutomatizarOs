@@ -1,43 +1,45 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using AutomatizarOs.Web.Components;
+using AutomatizarOs.Web.Security;
+using AutomatizarOs.Web.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "";
-        options.Audience = "";
-        options.RequireHttpsMetadata = true;
-    });
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
-builder.Services.AddAuthorization(options =>
+builder.Services.AddScoped<CookieService>();
+builder.Services.AddScoped<AccessTokenService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddHttpClient("ApiClient", opt =>
 {
-    options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
+    opt.BaseAddress = new Uri("http://localhost:5020/api/Identity/");
 });
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddAuthentication()
+    .AddScheme<CustomOption, JwtAuthenticationHandler>(
+        "JWTAuth", options =>{ });
+builder.Services.AddAuthorization();
+builder.Services.AddScoped<JwtAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+
+builder.Services.AddCascadingAuthenticationState();
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
 
-app.UseRouting();
+app.UseAntiforgery();
 
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+app.MapStaticAssets();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

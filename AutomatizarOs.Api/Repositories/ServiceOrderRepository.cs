@@ -27,20 +27,59 @@ namespace AutomatizarOs.Api.Repositories
                 using var connection = new OleDbConnection(ConnectionString);
                 await connection.OpenAsync();
 
-                const string query = @"SELECT TOP 10 os_codigo AS Id, os_situacao AS eServiceOrderStatus, 
-                                    emp_codigo AS eEnterprise, pro_codigo AS productType, 
-                                    os_marca AS productBrand, os_modelo AS productModel, 
-                                    os_ns AS productSerialNumber, os_defeito AS productDefect, 
-                                    os_solucao AS solution, os_valor AS amount, os_data_entrada AS entryDate, 
-                                    os_data_vistoria AS inspectionDate, os_data_concerto AS repairDate, 
-                                    os_data_entrega AS deliveryDate, cli_codigo AS customerId, 
-                                    os_concerto AS eRepair, os_semconserto AS eUnrepaired, 
-                                    os_valpeca AS partCost, os_valmo AS laborCost 
-                                    FROM os 
-                                    WHERE os_situacao <> 4
-                                    ORDER BY os_codigo DESC";
+                const string query = @"
+                SELECT 
+                    os.os_codigo AS Id,
+                    os.os_situacao AS eServiceOrderStatus,
+                    os.emp_codigo AS eEnterprise,
+                    os.pro_codigo AS productType,
+                    os.os_marca AS productBrand,
+                    os.os_modelo AS productModel,
+                    os.os_ns AS productSerialNumber,
+                    os.os_defeito AS productDefect,
+                    os.os_solucao AS solution,
+                    os.os_valor AS amount,
+                    os.os_data_entrada AS entryDate,
+                    os.os_data_vistoria AS inspectionDate,
+                    os.os_data_concerto AS repairDate,
+                    os.os_data_entrega AS deliveryDate,
+                    os.cli_codigo AS customerId,
+                    os.os_concerto AS eRepair,
+                    os.os_semconserto AS eUnrepaired,
+                    os.os_valpeca AS partCost,
+                    os.os_valmo AS laborCost,
 
-                var serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
+                    cli.cli_codigo AS [CustId],
+                    cli.cli_nome AS [Name],
+                    cli.cli_endereco AS [Street],
+                    cli.cli_bairro AS [Neighborhood],
+                    cli.cli_cidade AS [City],
+                    cli.cli_numero AS [Number],
+                    cli.cli_cep AS [ZipCode],
+                    cli.cli_uf AS [StateCode],
+                    cli.cli_telefone AS [Landline],
+                    cli.cli_celular AS [Phone],
+                    cli.cli_email AS [Email]
+
+                FROM cliente cli
+                INNER JOIN os ON os.cli_codigo = cli.cli_codigo
+                WHERE os.os_codigo IN (
+                    SELECT TOP 10 os_codigo
+                    FROM os
+                    WHERE os_situacao <> 4
+                    ORDER BY os_codigo DESC
+                )
+                ORDER BY os.os_codigo DESC";
+
+                var serviceOrders = (await connection.QueryAsync<ServiceOrder, Customer, ServiceOrder>(
+                    query,
+                    (os, customer) =>
+                    {
+                        os.Customer = customer;
+                        return os;
+                    },
+                    splitOn: "CustomerId"
+                )).ToList();
 
                 return serviceOrders;
             }

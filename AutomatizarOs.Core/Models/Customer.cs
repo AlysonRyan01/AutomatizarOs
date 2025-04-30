@@ -1,8 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace AutomatizarOs.Core.Models;
 
 public class Customer
 {
-    public long Id { get; set; }
+    public long CustId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Street { get; set; } = string.Empty;
     public string Neighborhood { get; set; } = string.Empty;
@@ -13,4 +15,5 @@ public class Customer
     public string Landline { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public ICollection<ServiceOrder> ServiceOrders { get; set; }
 }
