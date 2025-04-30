@@ -39,13 +39,31 @@ public class ServiceOrderHandler : IServiceOrderHandler
                 .ToListAsync();
 
             var newServiceOrders = serviceOrders.Where(c => !existingIds.Contains(c.Id)).ToList();
+            
+            var customerIds = newServiceOrders
+                .Select(o => o.Customer.CustId)
+                .Distinct()
+                .ToList();
+            
+            var existingCustomers = await _context.Customers
+                .Where(c => customerIds.Contains(c.CustId))
+                .ToListAsync();
 
             if (newServiceOrders.Any())
             {
+                foreach (var serviceOrder in newServiceOrders)
+                {
+                    var existingCustomer = existingCustomers.FirstOrDefault(x => x.CustId == serviceOrder.Customer.CustId);
+                    if (existingCustomer != null)
+                    {
+                        serviceOrder.Customer = existingCustomer;
+                        serviceOrder.CustomerId = existingCustomer.CustId;
+                    }
+                }
+                
                 _context.ServiceOrders.AddRange(newServiceOrders);
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-                return new Response<bool?>(true, 200, "Sucesso");
             }
 
             return new Response<bool?>(false, 200, "Sucesso");
@@ -94,7 +112,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
                     serviceOrder.InspectionDate = DateTime.Now;
                     serviceOrder.Amount = request.Amount;
                     serviceOrder.LaborCost = request.Amount;
-                    serviceOrder.Solution = request.Solution ?? string.Empty;
+                    serviceOrder.Solution = request.Solution;
                     break;
                 
                 case true:
@@ -103,7 +121,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
                     serviceOrder.InspectionDate = DateTime.Now;
                     serviceOrder.Amount = request.Amount;
                     serviceOrder.LaborCost = request.Amount;
-                    serviceOrder.Solution = request.Solution ?? string.Empty;
+                    serviceOrder.Solution = request.Solution;
                     serviceOrder.EUnrepaired = EUnrepaired.Repair;
                     break;
             }
@@ -191,7 +209,9 @@ public class ServiceOrderHandler : IServiceOrderHandler
             serviceOrder.ERepair = request.Repair;
 
             var cloudUpdateResult = await _serviceOrderRepository.UpdateCloudServiceOrder(serviceOrder);
-
+            if (cloudUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico na nuvem");
+                
             var updateStatusResult = await _serviceOrderRepository.UpdateStatusLocalServiceOrder(serviceOrder);
             if (updateStatusResult == false)
                 return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico localmente");
