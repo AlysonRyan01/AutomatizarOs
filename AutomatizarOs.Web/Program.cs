@@ -2,12 +2,15 @@ using AutomatizarOs.Web.Components;
 using AutomatizarOs.Web.Security;
 using AutomatizarOs.Web.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using MudBlazor;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddMudServices();
 builder.Services.AddScoped<CookieService>();
 builder.Services.AddScoped<AccessTokenService>();
 builder.Services.AddScoped<AuthService>();

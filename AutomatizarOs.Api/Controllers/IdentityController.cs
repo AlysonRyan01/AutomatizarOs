@@ -12,12 +12,10 @@ namespace AutomatizarOs.Api.Controllers
     public class IdentityController : ControllerBase
     {
         private readonly IIdentityHandler _identityHandler;
-        private readonly UserManager<User> _userManager;
 
-        public IdentityController(IIdentityHandler identityHandler, UserManager<User> userManager)
+        public IdentityController(IIdentityHandler identityHandler)
         {
             _identityHandler = identityHandler;
-            _userManager = userManager;
         }
 
         [HttpPost("login")]
