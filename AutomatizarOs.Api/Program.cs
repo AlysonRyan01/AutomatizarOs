@@ -4,6 +4,7 @@ using AutomatizarOs.Api.Handlers;
 using AutomatizarOs.Api.Hubs;
 using AutomatizarOs.Api.Repositories;
 using AutomatizarOs.Api.Services;
+using AutomatizarOs.Core;
 using AutomatizarOs.Core.Handlers;
 using AutomatizarOs.Core.Repositories;
 
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<JwtService>();
 
+builder.Services.AddCors();
 builder.AddConfigurationApiUrl();
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IIdentityHandler, IdentityHandler>();
@@ -56,6 +58,8 @@ builder.Services.AddQuartzHostedService(q =>
 builder.Services.AddScoped<ServiceOrderJob>();
 
 var app = builder.Build();
+
+app.UseCors(ApiConfiguration.CorsPolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
