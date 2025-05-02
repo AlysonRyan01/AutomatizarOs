@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AutomatizarOs.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class IdentityController : ControllerBase
     {
         private readonly IIdentityHandler _identityHandler;

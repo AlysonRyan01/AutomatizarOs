@@ -659,10 +659,6 @@ video {
   inset: -0.25rem;
 }
 
-.inset-0 {
-  inset: 0px;
-}
-
 .end-1 {
   inset-inline-end: 0.25rem;
 }
@@ -822,12 +818,16 @@ video {
   display: none;
 }
 
-.h-full {
-  height: 100%;
-}
-
 .min-h-\[100vh\] {
   min-height: 100vh;
+}
+
+.w-\[40vw\] {
+  width: 40vw;
+}
+
+.w-\[50vw\] {
+  width: 50vw;
 }
 
 .w-\[this-is\\\\\] {
@@ -844,6 +844,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.min-w-\[100vw\] {
+  min-width: 100vw;
 }
 
 .min-w-\[400px\] {
@@ -1372,6 +1376,10 @@ video {
   gap: 1rem;
 }
 
+.gap-5 {
+  gap: 1.25rem;
+}
+
 .space-x-2 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--tw-space-x-reverse));
@@ -1754,6 +1762,10 @@ video {
   border-width: 1px;
 }
 
+.border-2 {
+  border-width: 2px;
+}
+
 .border-x {
   border-left-width: 1px;
   border-right-width: 1px;
@@ -1815,6 +1827,11 @@ video {
 .bg-\[rgb\(255\2c 0\2c 0\)\] {
   --tw-bg-opacity: 1;
   background-color: rgb(255 0 0 / var(--tw-bg-opacity, 1));
+}
+
+.bg-cinza {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
 }
 
 .bg-white {
@@ -1936,6 +1953,14 @@ video {
   padding: 1rem;
 }
 
+.p-\[10px\] {
+  padding: 10px;
+}
+
+.p-\[50px\] {
+  padding: 50px;
+}
+
 .px-1 {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -2019,9 +2044,14 @@ video {
   font-family: Titillium Web, sans-serif;
 }
 
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .font-bold {
@@ -2100,9 +2130,9 @@ video {
   color: rgb(51 102 153 / .35);
 }
 
-.text-roxo {
+.text-titlecolor {
   --tw-text-opacity: 1;
-  color: rgb(124 69 173 / var(--tw-text-opacity, 1));
+  color: rgb(38 38 38 / var(--tw-text-opacity, 1));
 }
 
 .text-white {
@@ -2555,6 +2585,28 @@ video {
 
   .sm\:underline {
     text-decoration-line: underline;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:min-h-\[500px\] {
+    min-height: 500px;
+  }
+
+  .lg\:w-\[900px\] {
+    width: 900px;
+  }
+
+  .lg\:w-\[\] {
+    width: ;
+  }
+
+  .lg\:w-auto {
+    width: auto;
+  }
+
+  .lg\:p-\[50px\] {
+    padding: 50px;
   }
 }
 

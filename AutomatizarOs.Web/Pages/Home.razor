@@ -1,9 +1,63 @@
 ﻿@page "/"
+@layout MainLayout
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@inject IDialogService Dialog
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<div class="flex flex-col min-h-[100vh] min-w-[100vw] items-center justify-center bg-cinza">
+    <MudTabs Elevation="5" ActiveTabClass="border-solid border-2 mud-border-primary" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
+             ApplyEffectsToContainer="true" Class="bg-white w-full min-h-[100vh] lg:w-[900px] lg:min-h-[500px]">
+        <MudTabPanel Text="ORÇAMENTOS PENDENTES">
+            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
+                @foreach (var item in OrcamentosPendentes)
+                {
+                    <MudButton OnClick="() => AbrirDialogAtualizar(item)" Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
+                    </MudButton>
+                }
+            </div>
+        </MudTabPanel>
+        <MudTabPanel Text="AGUARDANDO RESPOSTA">
+            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
+                @foreach (var item in AguardandoResposta)
+                {
+                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
+                    </MudButton>
+                }
+            </div>
+        </MudTabPanel>
+        <MudTabPanel Text="AGUARDANDO PEÇA">
+            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
+                @foreach (var item in AguardandoPeca)
+                {
+                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
+                    </MudButton>
+                }
+            </div>
+        </MudTabPanel>
+        <MudTabPanel Text="AGUARDANDO RETIRADA">
+            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
+                @foreach (var item in AguardandoColeta)
+                {
+                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
+                    </MudButton>
+                }
+            </div>
+        </MudTabPanel>
+        <MudTabPanel Text="ENTREGUES">
+            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
+                @foreach (var item in Entregues)
+                {
+                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
+                    </MudButton>
+                }
+            </div>
+        </MudTabPanel>
+    </MudTabs>
+</div>

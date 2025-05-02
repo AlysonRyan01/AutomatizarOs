@@ -1,0 +1,22 @@
+@using AutomatizarOs.Core.Handlers
+@using AutomatizarOs.Core.Models
+@inject IServiceOrderHandler ServiceOrderHandler
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">Atualizar Ordem de Serviço @ServiceOrder.Id</MudText>
+    </DialogContent>
+
+    <DialogActions>
+        <MudButton OnClick="Salvar" Color="Color.Primary">Salvar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ServiceOrder ServiceOrder { get; set; }
+
+    private void Salvar()
+    {
+        
+    }
+}

@@ -29,12 +29,12 @@ public class ServiceOrderJob : IJob
                 _logger.LogWarning("Falha ao buscar novas ordens: {Message}", 
                     newOrderResponse.Message);
             }
-            else if (newOrderResponse.Data != null)
+            else if (newOrderResponse.Data == true)
             {
                 if (newOrderResponse.Data!.Value)
                     await _hubContext.Clients.All.SendAsync("NovaOSRecebida", newOrderResponse.Message);
                 
-                _logger.LogInformation("Nova ordem sincronizada!");
+                Console.WriteLine("Nova ordem sincronizada e signalR funcionando!");
             }
             
         }

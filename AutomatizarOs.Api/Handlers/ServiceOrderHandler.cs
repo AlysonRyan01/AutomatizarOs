@@ -23,6 +23,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
     public async Task<Response<bool?>> GetLocalServiceOrder()
     {
         Console.WriteLine("Rodando a query");
+        var response = new Response<bool?>(false, 200, "Sucesso");
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
@@ -51,6 +52,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
 
             if (newServiceOrders.Any())
             {
+                response.Data = true;
                 foreach (var serviceOrder in newServiceOrders)
                 {
                     var existingCustomer = existingCustomers.FirstOrDefault(x => x.CustId == serviceOrder.Customer.CustId);
@@ -66,7 +68,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
                 await transaction.CommitAsync();
             }
 
-            return new Response<bool?>(false, 200, "Sucesso");
+            return response;
         }
         catch (Exception ex)
         {
