@@ -6,17 +6,18 @@
 
 <PageTitle>Home</PageTitle>
 
-<div class="flex flex-col min-h-[100vh] min-w-[100vw] items-center justify-center bg-cinza">
-    <MudTabs Elevation="5" ActiveTabClass="border-solid border-2 mud-border-primary" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
-             ApplyEffectsToContainer="true" Class="bg-white w-full min-h-[100vh] lg:w-[900px] lg:min-h-[500px]">
+<div class="flex flex-col min-h-[100vh] min-w-[100vw] items-center justify-center ">
+    <MudTabs Centered="true" Color="Color.Primary" Elevation="5" ActiveTabClass="border-solid border-2 mud-border-primary" Outlined="true" Position="Position.Left" Rounded="true" Border="true"
+             ApplyEffectsToContainer="true" Class="bg-cinza w-full min-h-[100vh]">
         <MudTabPanel Text="ORÇAMENTOS PENDENTES">
-            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
-                <MudTable Items="@OrcamentosPendentes.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm">
+            <div class="w-full flex flex-wrap justify-center">
+                <MudTable Class="min-w-[100%]" Items="@OrcamentosPendentes" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
                         <MudTh>Número</MudTh>
                         <MudTh>Cliente</MudTh>
                         <MudTh>Modelo</MudTh>
                         <MudTh>Serie</MudTh>
+                        <MudTh>Defeito</MudTh>
                         <MudTh>Ação</MudTh>
                     </HeaderContent>
                     <RowTemplate>
@@ -24,51 +25,108 @@
                         <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
                         <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
                         <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
+                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
                         <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                            <p class="font-bold text-base">Orçamento</p>
+                            <p class="text-base">Orçamento</p>
                         </MudButton></MudTd>
                     </RowTemplate>
                 </MudTable>
             </div>
         </MudTabPanel>
         <MudTabPanel Text="AGUARDANDO RESPOSTA">
-            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
-                @foreach (var item in AguardandoResposta)
-                {
-                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
-                    </MudButton>
-                }
+            <div class="w-full flex flex-wrap justify-center">
+                <MudTable Class="min-w-[100%]" Items="@AguardandoResposta" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <HeaderContent>
+                        <MudTh>Número</MudTh>
+                        <MudTh>Cliente</MudTh>
+                        <MudTh>Modelo</MudTh>
+                        <MudTh>Serie</MudTh>
+                        <MudTh>Defeito</MudTh>
+                        <MudTh>Ação</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Número">@context.Id</MudTd>
+                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
+                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
+                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
+                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Orçamento</p>
+                            </MudButton></MudTd>
+                    </RowTemplate>
+                </MudTable>
             </div>
         </MudTabPanel>
         <MudTabPanel Text="AGUARDANDO PEÇA">
-            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
-                @foreach (var item in AguardandoPeca)
-                {
-                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
-                    </MudButton>
-                }
+            <div class="w-full flex flex-wrap justify-center">
+                <MudTable Class="min-w-[100%]" Items="@AguardandoPeca" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <HeaderContent>
+                        <MudTh>Número</MudTh>
+                        <MudTh>Cliente</MudTh>
+                        <MudTh>Modelo</MudTh>
+                        <MudTh>Serie</MudTh>
+                        <MudTh>Defeito</MudTh>
+                        <MudTh>Ação</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Número">@context.Id</MudTd>
+                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
+                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
+                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
+                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Orçamento</p>
+                            </MudButton></MudTd>
+                    </RowTemplate>
+                </MudTable>
             </div>
         </MudTabPanel>
         <MudTabPanel Text="AGUARDANDO RETIRADA">
-            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
-                @foreach (var item in AguardandoColeta)
-                {
-                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
-                    </MudButton>
-                }
+            <div class="w-full flex flex-wrap justify-center">
+                <MudTable Class="min-w-[100%]" Items="@AguardandoColeta" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <HeaderContent>
+                        <MudTh>Número</MudTh>
+                        <MudTh>Cliente</MudTh>
+                        <MudTh>Modelo</MudTh>
+                        <MudTh>Serie</MudTh>
+                        <MudTh>Defeito</MudTh>
+                        <MudTh>Ação</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Número">@context.Id</MudTd>
+                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
+                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
+                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
+                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Orçamento</p>
+                            </MudButton></MudTd>
+                    </RowTemplate>
+                </MudTable>
             </div>
         </MudTabPanel>
         <MudTabPanel Text="ENTREGUES">
-            <div class="flex flex-wrap justify-center gap-5 p-[10px] lg:p-[50px]">
-                @foreach (var item in Entregues)
-                {
-                    <MudButton Class="w-[40vw] lg:w-auto" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                        <p class="font-bold text-lg p-[10px]">@item.Id</p>
-                    </MudButton>
-                }
+            <div class="w-full flex flex-wrap justify-center">
+                <MudTable Class="min-w-[100%]" Items="@Entregues" Hover="true" Breakpoint="Breakpoint.Sm">
+                    <HeaderContent>
+                        <MudTh>Número</MudTh>
+                        <MudTh>Cliente</MudTh>
+                        <MudTh>Modelo</MudTh>
+                        <MudTh>Serie</MudTh>
+                        <MudTh>Defeito</MudTh>
+                        <MudTh>Ação</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Número">@context.Id</MudTd>
+                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
+                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
+                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
+                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Orçamento</p>
+                            </MudButton></MudTd>
+                    </RowTemplate>
+                </MudTable>
             </div>
         </MudTabPanel>
     </MudTabs>

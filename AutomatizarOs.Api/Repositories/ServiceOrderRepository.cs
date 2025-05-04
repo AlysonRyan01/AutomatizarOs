@@ -109,7 +109,7 @@ namespace AutomatizarOs.Api.Repositories
         {
             try
             {
-                return await _context.ServiceOrders.ToListAsync();
+                return await _context.ServiceOrders.Include(x => x.Customer).AsNoTracking().ToListAsync();
             }
             catch (SqlException ex) when (ex.Number == -2)
             {
