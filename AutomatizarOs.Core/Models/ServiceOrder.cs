@@ -37,4 +37,6 @@ public class ServiceOrder
     public decimal LaborCost { get; set; }
 
     public Customer Customer { get; set; } = null!;
+
+    public string Location { get; set; } = string.Empty;
 }

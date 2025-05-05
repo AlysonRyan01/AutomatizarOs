@@ -119,4 +119,23 @@ public class ServiceOrderHandler : IServiceOrderHandler
             return HttpExceptionHandler.Handle<ServiceOrder>(ex);
         }
     }
+    
+    public async Task<Response<bool>> AddLocation(AddLocationRequest request)
+    {
+        try
+        {
+            var result = await _httpClient.PutAsJsonAsync("v1/ServiceOrder/add-location", request);
+            
+            if (!result.IsSuccessStatusCode)
+                return new Response<bool>(false, 500, "Erro ao adicionar uma prateleira na ordem de servico");
+
+            var content = await result.Content.ReadFromJsonAsync<Response<bool>>();
+
+            return content ?? new Response<bool>(false, 500, "Erro ao processar a resposta");
+        }
+        catch (Exception ex)
+        {
+            return HttpExceptionHandler.Handle<bool>(ex);
+        }
+    }
 }

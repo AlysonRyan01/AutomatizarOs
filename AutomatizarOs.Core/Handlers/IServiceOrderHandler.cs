@@ -12,6 +12,5 @@ public interface IServiceOrderHandler
     Task<Response<ServiceOrder>> AddRepairById(long id);
     Task<Response<ServiceOrder>> AddDeliveryById(long id);
     Task<Response<ServiceOrder>> AddStatusById(AddStatusByIdRequest request);
-
-
+    Task<Response<bool>> AddLocation(AddLocationRequest request);
 }

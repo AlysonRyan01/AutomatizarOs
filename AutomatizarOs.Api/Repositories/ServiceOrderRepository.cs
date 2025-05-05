@@ -4,6 +4,7 @@ using AutomatizarOs.Api.Data;
 using AutomatizarOs.Core.Enums;
 using AutomatizarOs.Core.Models;
 using AutomatizarOs.Core.Repositories;
+using AutomatizarOs.Core.Requests.ServiceOrderRequests;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -184,6 +185,32 @@ namespace AutomatizarOs.Api.Repositories
             catch (DbUpdateException ex)
             {
                 Console.WriteLine($"Erro ao atualizar no Entity Framework: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro inesperado: {ex}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateLocationServiceOrder(AddLocationRequest request)
+        {
+            try
+            {
+                var serviceOrder = await _context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == request.Id);
+                if (serviceOrder == null)
+                    return false;
+                
+                serviceOrder.Location = request.Location;
+                
+                _context.ServiceOrders.Update(serviceOrder);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Erro ao atualizar a localizaçao no Entity Framework: {ex.Message}");
                 return false;
             }
             catch (Exception ex)

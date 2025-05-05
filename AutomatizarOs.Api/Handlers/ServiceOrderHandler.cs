@@ -229,4 +229,20 @@ public class ServiceOrderHandler : IServiceOrderHandler
             return new Response<ServiceOrder>(null, 500, "Erro interno no servidor");
         }
     }
+
+    public async Task<Response<bool>> AddLocation(AddLocationRequest request)
+    {
+        try
+        {
+            var result = await _serviceOrderRepository.UpdateLocationServiceOrder(request);
+            if (result == false)
+                return new Response<bool>(false, 500, "Erro ao adicionar uma localizaçao.");
+            
+            return new Response<bool>(true, 200, "Localizaçao adicionada com sucesso");
+        }
+        catch (Exception e)
+        {
+            return new Response<bool>(false, 500, e.Message);
+        }
+    }
 }

@@ -91,5 +91,9 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
             .WithMany(c => c.ServiceOrders)
             .HasForeignKey(so => so.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.Property(so => so.Location)
+            .HasColumnName("Location")
+            .HasMaxLength(50);
     }
 }
