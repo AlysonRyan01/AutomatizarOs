@@ -6,89 +6,69 @@
 
 <MudDialog>
     <TitleContent>
-        <h2 class="font-extrabold text-lg lg:text-2xl font-sans text-[#750303]">ADICIONAR ORÇAMENTO OS: @ServiceOrder.Id</h2>
+        <h2 class="font-extrabold text-lg lg:text-2xl font-sans text-[#750303]">ADICIONAR ENTREGA OS: @ServiceOrder.Id</h2>
     </TitleContent>
     <DialogContent>
         <div class="flex flex-col w-full gap-3 border-t border-b border-[#dfdfdf] my-4">
             <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3 mb-3">EMPRESA: @ServiceOrder.EEnterprise</h2>
         </div>
         <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
-            <h2 class="font-bold text-lg font-sans text-[#750303] mt-3">DADOS DO CLIENTE</h2>
+            <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3">DADOS DO CLIENTE</h2>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">NOME:</span> @ServiceOrder.Customer.Name</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">ENDEREÇO:</span> @ServiceOrder.Customer.Street, @ServiceOrder.Customer.Number, @ServiceOrder.Customer.Neighborhood</p>
             <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">TELEFONE:</span> @ServiceOrder.Customer.Phone</p>
         </div>
         <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
-            <h2 class="font-bold text-lg font-sans text-[#750303] mt-3">DADOS DO PRODUTO</h2>
+            <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3">DADOS DO PRODUTO</h2>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">TIPO:</span> @ServiceOrder.ProductType</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">MARCA:</span> @ServiceOrder.ProductBrand</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">MODELO:</span> @ServiceOrder.ProductModel</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SÉRIE:</span> @ServiceOrder.ProductSerialNumber</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">DEFEITO:</span> @ServiceOrder.ProductDefect</p>
             <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">DATA DE ENTRADA:</span> @ServiceOrder.EntryDate.ToString("dd/MM/yyyy")</p>
-            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SITUAÇÃO:</span> @Situacao</p>
         </div>
-        <div class="flex flex-col w-full gap-3 mb-[50px]">
-            <h2 class="font-bold text-lg font-sans text-[#750303] mt-3">ADICIONAR ORÇAMENTO</h2>
-            <MudForm @ref="_form" Class="flex flex-col items-start w-full gap-3" @onsubmit="AdicionarOrcamento">
-                <MudTextField Label="Solução"
-                              @bind-Value="Request.Solution"
-                              For="@(() => Request.Solution)"
-                              Variant="Variant.Outlined"
-                              Class="min-w-[300px]"/>
-
-                <MudNumericField Label="Valor"
-                                 @bind-Value="Request.Amount"
-                                 For="@(() => Request.Amount)"
-                                 Variant="Variant.Outlined"
-                                 Class="min-w-[100px]"/>
-
-                <MudCheckBox For="@(() => Request.CanBeRepaired)" Color="Color.Primary" @bind-Value="Request.CanBeRepaired" Label="Tem conserto?"></MudCheckBox>
-
-                <MudButton @onclick="AdicionarOrcamento"
-                           Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           Class="text-white text-lg font-semibold py-2 px-5 rounded-lg transition">
-                    Adicionar
-                </MudButton>
-            </MudForm>
+        <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
+            <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3">INFORMAÇÕES SOBRE O ORÇAMENTO</h2>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SOLUÇÃO:</span> @ServiceOrder.Solution</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">VALOR:</span> @ServiceOrder.Amount</p>
+            <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">CONSERTO FEITO EM:</span> @ServiceOrder.RepairDate?.ToString("dd/MM/yyyy")</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SITUAÇÃO:</span> @Situacao</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">TEM CONSERTO?</span> @TemConserto</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">RESPOSTA DO CLIENTE:</span> @Resposta</p>
+        </div>
+        <div class="flex flex-row w-full gap-3 mb-[50px]">
+            <MudButton @onclick="Entregue"
+                       EndIcon="@Icons.Material.Filled.Done"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Class="text-white text-lg font-semibold py-2 px-5 rounded-lg transition">
+                ENTREGUE
+            </MudButton>
         </div>
     </DialogContent>
 </MudDialog>
 
 @code {
-    private MudForm _form = null!;
-    public AddQuoteRequest Request { get; set; } = new();
-    
     [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public ServiceOrder ServiceOrder { get; set; } = new ();
-    [Parameter] public EventCallback OnQuoteAdded { get; set; }
+    [Parameter] public EventCallback OnEntregaAdded { get; set; }
     [Inject] public IServiceOrderHandler ServiceOrderHandler { get; set; } = null!;
     [Inject] public ISnackbar Snackbar { get; set; } = null!;
 
-    public async Task AdicionarOrcamento()
+    public async Task Entregue()
     {
         try
         {
-            await _form.Validate();
-
-            if (!_form.IsValid)
-            {
-                Snackbar.Add("Preencha os campos obrigatórios corretamente.", Severity.Error);
-                return;
-            }
+            var result = await ServiceOrderHandler.AddDeliveryById(ServiceOrder.Id);
             
-            Request.Id = ServiceOrder.Id;
-            var result = await ServiceOrderHandler.AddQuoteById(Request);
-
             if (result.IsSuccess)
             {
-                Snackbar.Add("Orçamento adicionado com sucesso!", Severity.Success);
-                await OnQuoteAdded.InvokeAsync();
+                Snackbar.Add("Produto entregue com sucesso!", Severity.Success);
+                await OnEntregaAdded.InvokeAsync();
                 MudDialog.Close(DialogResult.Ok(true));
             }
             else
-                Snackbar.Add(result.Message ?? "Ocorreu um erro ao adicionar o orçamento!", Severity.Error);
+                Snackbar.Add(result.Message ?? "Ocorreu um erro entregar o produto!", Severity.Error);
         }
         catch (Exception e)
         {
@@ -106,4 +86,22 @@
             _ => "Desconhecido"
         };
     
+    public string TemConserto =>
+        ServiceOrder.EUnrepaired switch
+        {
+            EUnrepaired.Repair => "Sim",
+            EUnrepaired.Unrepaired => "Não",
+            EUnrepaired.NoDefectFound => "Não apresentou defeito",
+            _ => "Desconhecido"
+        };
+    
+    public string Resposta =>
+        ServiceOrder.ERepair switch
+        {
+            ERepair.Entered => "Sem orçamento ainda",
+            ERepair.Waiting => "Aguardando resposta",
+            ERepair.Approved => "Aprovado",
+            ERepair.Disapproved => "Não aprovou",
+            _ => "Desconhecido"
+        };
 }

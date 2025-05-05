@@ -48,7 +48,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
     {
         try
         {
-            var result = await _httpClient.PostAsJsonAsync("v1/ServiceOrder/add-quote", request);
+            var result = await _httpClient.PutAsJsonAsync("v1/ServiceOrder/add-quote", request);
             
             if (!result.IsSuccessStatusCode)
                 return new Response<ServiceOrder>(null, 500, "Erro ao adicionar o orçamento de servico");
@@ -67,7 +67,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
     {
         try
         {
-            var result = await _httpClient.PostAsJsonAsync("v1/ServiceOrder/add-repair", id);
+            var result = await _httpClient.PutAsJsonAsync("v1/ServiceOrder/add-repair", id);
             
             if (!result.IsSuccessStatusCode)
                 return new Response<ServiceOrder>(null, 500, "Erro ao adicionar o conserto na ordem de servico");
@@ -86,7 +86,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
     {
         try
         {
-            var result = await _httpClient.PostAsJsonAsync("v1/ServiceOrder/add-delivery", id);
+            var result = await _httpClient.PutAsJsonAsync("v1/ServiceOrder/add-delivery", id);
             
             if (!result.IsSuccessStatusCode)
                 return new Response<ServiceOrder>(null, 500, "Erro ao adicionar a entrega na ordem de servico");
@@ -105,7 +105,7 @@ public class ServiceOrderHandler : IServiceOrderHandler
     {
         try
         {
-            var result = await _httpClient.PostAsJsonAsync("v1/ServiceOrder/add-status", request);
+            var result = await _httpClient.PutAsJsonAsync("v1/ServiceOrder/add-status", request);
             
             if (!result.IsSuccessStatusCode)
                 return new Response<ServiceOrder>(null, 500, "Erro ao adicionar um status na ordem de servico");

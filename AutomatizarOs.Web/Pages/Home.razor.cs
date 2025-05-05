@@ -25,6 +25,7 @@ public partial class Home : ComponentBase
     
     [Inject] public IServiceOrderHandler ServiceOrderHandler { get; set; } = null!;
     [Inject] public HubConnection HubConnection { get; set; } = null!;
+    [Inject] public IDialogService DialogService { get; set; } = null!;
     
     protected override async Task OnInitializedAsync()
     {
@@ -57,7 +58,103 @@ public partial class Home : ComponentBase
         StateHasChanged();
     }
     
-    private void AbrirDialogAtualizar(ServiceOrder ordem)
+    private async Task AbrirDialogAtualizar(ServiceOrder ordem)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ServiceOrder"] = ordem,
+            ["OnQuoteAdded"] = EventCallback.Factory.Create(this, AtualizarServiceOrders)
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large
+        };
+
+        var dialog = await DialogService.ShowAsync<AddOrcamentoDialog>("Atualizar Ordem de Serviço", parameters, options);
+        var result = await dialog.Result;
+    
+        if (result!.Canceled)
+        {
+            await AtualizarServiceOrders();
+        }
+    }
+    
+    private async Task AbrirDialogResposta(ServiceOrder ordem)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ServiceOrder"] = ordem,
+            ["OnResponseAdded"] = EventCallback.Factory.Create(this, AtualizarServiceOrders)
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large
+        };
+
+        var dialog = await DialogService.ShowAsync<AddRespostaDialog>("Adicionar resposta", parameters, options);
+        var result = await dialog.Result;
+    
+        if (result!.Canceled)
+        {
+            await AtualizarServiceOrders();
+        }
+    }
+    
+    private async Task AbrirDialogConserto(ServiceOrder ordem)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ServiceOrder"] = ordem,
+            ["OnConsertoAdded"] = EventCallback.Factory.Create(this, AtualizarServiceOrders)
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large
+        };
+
+        var dialog = await DialogService.ShowAsync<AddConsertoDialog>("Adicionar conserto", parameters, options);
+        var result = await dialog.Result;
+    
+        if (result!.Canceled)
+        {
+            await AtualizarServiceOrders();
+        }
+    }
+    
+    private async Task AbrirDialogEntrega(ServiceOrder ordem)
+    {
+        var parameters = new DialogParameters
+        {
+            ["ServiceOrder"] = ordem,
+            ["OnEntregaAdded"] = EventCallback.Factory.Create(this, AtualizarServiceOrders)
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Large
+        };
+
+        var dialog = await DialogService.ShowAsync<AddEntregaDialog>("Adicionar entrega", parameters, options);
+        var result = await dialog.Result;
+    
+        if (result!.Canceled)
+        {
+            await AtualizarServiceOrders();
+        }
+    }
+    
+    private async Task AbrirDialogVer(ServiceOrder ordem)
     {
         var parameters = new DialogParameters
         {
@@ -68,9 +165,9 @@ public partial class Home : ComponentBase
         {
             CloseButton = true,
             FullWidth = true,
-            MaxWidth = MaxWidth.Medium
+            MaxWidth = MaxWidth.Large
         };
 
-        Dialog.ShowAsync<AddOrcamentoDialog>("Atualizar Ordem de Serviço", parameters, options);
+        await DialogService.ShowAsync<AddVerDialog>("Ver OS", parameters, options);
     }
 }

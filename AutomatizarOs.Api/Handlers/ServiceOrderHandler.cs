@@ -113,7 +113,6 @@ public class ServiceOrderHandler : IServiceOrderHandler
                     serviceOrder.ERepair = ERepair.Disapproved;
                     serviceOrder.InspectionDate = DateTime.Now;
                     serviceOrder.Amount = request.Amount;
-                    serviceOrder.LaborCost = request.Amount;
                     serviceOrder.Solution = request.Solution;
                     break;
                 
@@ -185,6 +184,10 @@ public class ServiceOrderHandler : IServiceOrderHandler
             
             serviceOrder.EServiceOrderStatus = EServiceOrderStatus.Delivered;
             serviceOrder.DeliveryDate = DateTime.Now;
+            
+            var cloudUpdateResult = await _serviceOrderRepository.UpdateCloudServiceOrder(serviceOrder);
+            if (cloudUpdateResult == false)
+                return new Response<ServiceOrder>(null, 500, "Erro ao atualizar a ordem de servico na nuvem");
             
             var localUpdateResult = await _serviceOrderRepository.UpdateDeliveryLocalServiceOrder(serviceOrder);
             if (localUpdateResult == false)

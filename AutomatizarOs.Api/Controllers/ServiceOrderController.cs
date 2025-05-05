@@ -49,7 +49,7 @@ public class ServiceOrderController(IServiceOrderHandler handler) : ControllerBa
     }
 
     [HttpPut("add-quote")]
-    public async Task<IActionResult> AddQuote(AddQuoteRequest request)
+    public async Task<IActionResult> AddQuote([FromBody] AddQuoteRequest request)
     {
         try
         {
@@ -69,7 +69,7 @@ public class ServiceOrderController(IServiceOrderHandler handler) : ControllerBa
     }
     
     [HttpPut("add-repair")]
-    public async Task<IActionResult> AddRepair(long id)
+    public async Task<IActionResult> AddRepair([FromBody] long id)
     {
         try
         {
@@ -89,7 +89,7 @@ public class ServiceOrderController(IServiceOrderHandler handler) : ControllerBa
     }
     
     [HttpPut("add-delivery")]
-    public async Task<IActionResult> AddDelivery(long id)
+    public async Task<IActionResult> AddDelivery([FromBody] long id)
     {
         try
         {
@@ -109,7 +109,7 @@ public class ServiceOrderController(IServiceOrderHandler handler) : ControllerBa
     }
     
     [HttpPut("add-status")]
-    public async Task<IActionResult> AddStatus(AddStatusByIdRequest request)
+    public async Task<IActionResult> AddStatus([FromBody] AddStatusByIdRequest request)
     {
         try
         {

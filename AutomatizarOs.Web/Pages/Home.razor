@@ -7,26 +7,28 @@
 <PageTitle>Home</PageTitle>
 
 <div class="flex flex-col min-h-[100vh] min-w-[100vw] items-center justify-center ">
-    <MudTabs Centered="true" Color="Color.Primary" Elevation="5" ActiveTabClass="border-solid border-2 mud-border-primary" Outlined="true" Position="Position.Left" Rounded="true" Border="true"
+    <MudTabs Centered="true" Color="Color.Primary" Elevation="5" ActiveTabClass="border-solid border-2 mud-border-primary" Outlined="true" Position="Position.Top" Rounded="true" Border="true"
              ApplyEffectsToContainer="true" Class="bg-cinza w-full min-h-[100vh]">
         <MudTabPanel Text="ORÇAMENTOS PENDENTES">
             <div class="w-full flex flex-wrap justify-center">
                 <MudTable Class="min-w-[100%]" Items="@OrcamentosPendentes" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
-                        <MudTh>Número</MudTh>
-                        <MudTh>Cliente</MudTh>
-                        <MudTh>Modelo</MudTh>
-                        <MudTh>Serie</MudTh>
-                        <MudTh>Defeito</MudTh>
-                        <MudTh>Ação</MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Número</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Cliente</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Empresa</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Modelo</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Defeito</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Entrada</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Ação</p></MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Número">@context.Id</MudTd>
-                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
-                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
-                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
-                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
-                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
+                        <MudTd DataLabel="Número"><p class="font-sans font-bold text-lg">@context.Id</p></MudTd>
+                        <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
+                        <MudTd DataLabel="Empresa"><p class="text-sm font-sans font-normal uppercase">@context.EEnterprise</p></MudTd>
+                        <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
+                        <MudTd DataLabel="Defeito"><p class="text-sm font-sans font-normal uppercase">@context.ProductDefect</p></MudTd>
+                        <MudTd DataLabel="Entrada"><p class="text-sm font-sans font-normal uppercase">@context.EntryDate.ToString("dd/MM/yyyy") (Há @( (DateTime.Now - context.EntryDate).Days ) dias)</p></MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.Done" Variant="Variant.Filled" Color="Color.Primary">
                             <p class="text-base">Orçamento</p>
                         </MudButton></MudTd>
                     </RowTemplate>
@@ -37,21 +39,21 @@
             <div class="w-full flex flex-wrap justify-center">
                 <MudTable Class="min-w-[100%]" Items="@AguardandoResposta" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
-                        <MudTh>Número</MudTh>
-                        <MudTh>Cliente</MudTh>
-                        <MudTh>Modelo</MudTh>
-                        <MudTh>Serie</MudTh>
-                        <MudTh>Defeito</MudTh>
-                        <MudTh>Ação</MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Número</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Cliente</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Modelo</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Solução</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Valor</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Ação</p></MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Número">@context.Id</MudTd>
-                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
-                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
-                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
-                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
-                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                                <p class="text-base">Orçamento</p>
+                        <MudTd DataLabel="Número"><p class="font-sans font-bold text-lg">@context.Id</p></MudTd>
+                        <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
+                        <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
+                        <MudTd DataLabel="Solução"><p class="text-sm font-sans font-normal uppercase">@context.Solution</p></MudTd>
+                        <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount,00</p></MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogResposta(context)" EndIcon="@Icons.Material.Filled.Done" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Resposta</p>
                             </MudButton></MudTd>
                     </RowTemplate>
                 </MudTable>
@@ -61,21 +63,21 @@
             <div class="w-full flex flex-wrap justify-center">
                 <MudTable Class="min-w-[100%]" Items="@AguardandoPeca" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
-                        <MudTh>Número</MudTh>
-                        <MudTh>Cliente</MudTh>
-                        <MudTh>Modelo</MudTh>
-                        <MudTh>Serie</MudTh>
-                        <MudTh>Defeito</MudTh>
-                        <MudTh>Ação</MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Número</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Cliente</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Modelo</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Solução</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Entrada</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Ação</p></MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Número">@context.Id</MudTd>
-                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
-                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
-                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
-                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
-                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                                <p class="text-base">Orçamento</p>
+                        <MudTd DataLabel="Número"><p class="font-sans font-bold text-lg">@context.Id</p></MudTd>
+                        <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
+                        <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
+                        <MudTd DataLabel="Solução"><p class="text-sm font-sans font-normal uppercase">@context.Solution</p></MudTd>
+                        <MudTd DataLabel="Defeito"><p class="text-sm font-sans font-normal uppercase">@context.EntryDate.ToString("dd/MM/yyyy") (Há @( (DateTime.Now - context.EntryDate).Days ) dias)</p></MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogConserto(context)" EndIcon="@Icons.Material.Filled.Done" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Conserto</p>
                             </MudButton></MudTd>
                     </RowTemplate>
                 </MudTable>
@@ -85,21 +87,23 @@
             <div class="w-full flex flex-wrap justify-center">
                 <MudTable Class="min-w-[100%]" Items="@AguardandoColeta" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
-                        <MudTh>Número</MudTh>
-                        <MudTh>Cliente</MudTh>
-                        <MudTh>Modelo</MudTh>
-                        <MudTh>Serie</MudTh>
-                        <MudTh>Defeito</MudTh>
-                        <MudTh>Ação</MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Número</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Cliente</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Modelo</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Defeito</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Solução</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Data do Conserto</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Ação</p></MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Número">@context.Id</MudTd>
-                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
-                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
-                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
-                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
-                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                                <p class="text-base">Orçamento</p>
+                        <MudTd DataLabel="Número"><p class="font-sans font-bold text-lg">@context.Id</p></MudTd>
+                        <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
+                        <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
+                        <MudTd DataLabel="Defeito"><p class="text-sm font-sans font-normal uppercase">@context.ProductDefect</p></MudTd>
+                        <MudTd DataLabel="Solução"><p class="text-sm font-sans font-normal uppercase">@context.Solution</p></MudTd>
+                        <MudTd DataLabel="Data do Conserto"><p class="text-sm font-sans font-normal uppercase">@context.RepairDate?.ToString("dd/MM/yyyy")</p></MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogEntrega(context)" EndIcon="@Icons.Material.Filled.Done" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Entregue</p>
                             </MudButton></MudTd>
                     </RowTemplate>
                 </MudTable>
@@ -109,21 +113,23 @@
             <div class="w-full flex flex-wrap justify-center">
                 <MudTable Class="min-w-[100%]" Items="@Entregues" Hover="true" Breakpoint="Breakpoint.Sm">
                     <HeaderContent>
-                        <MudTh>Número</MudTh>
-                        <MudTh>Cliente</MudTh>
-                        <MudTh>Modelo</MudTh>
-                        <MudTh>Serie</MudTh>
-                        <MudTh>Defeito</MudTh>
-                        <MudTh>Ação</MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Número</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Cliente</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Modelo</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Solução</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Valor</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Data da Entrega</p></MudTh>
+                        <MudTh><p class="text-xl text-[#750303] font-bold">Ação</p></MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Número">@context.Id</MudTd>
-                        <MudTd DataLabel="Cliente">@context.Customer.Name</MudTd>
-                        <MudTd DataLabel="Modelo">@context.ProductModel</MudTd>
-                        <MudTd DataLabel="Serie">@context.ProductSerialNumber</MudTd>
-                        <MudTd DataLabel="Defeito">@context.ProductDefect</MudTd>
-                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogAtualizar(context)" EndIcon="@Icons.Material.Filled.ArrowForward" Variant="Variant.Filled" Color="Color.Primary">
-                                <p class="text-base">Orçamento</p>
+                        <MudTd DataLabel="Número"><p class="font-sans font-bold text-lg">@context.Id</p></MudTd>
+                        <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
+                        <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
+                        <MudTd DataLabel="Solução"><p class="text-sm font-sans font-normal uppercase">@context.Solution</p></MudTd>
+                        <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount,00</p></MudTd>
+                        <MudTd DataLabel="Data da Entrega"><p class="text-sm font-sans font-normal uppercase">@context.DeliveryDate?.ToString("dd/MM/yyyy")</p></MudTd>
+                        <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogVer(context)" EndIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Filled" Color="Color.Primary">
+                                <p class="text-base">Ver</p>    
                             </MudButton></MudTd>
                     </RowTemplate>
                 </MudTable>

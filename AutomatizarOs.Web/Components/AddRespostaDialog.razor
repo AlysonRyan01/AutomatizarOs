@@ -1,0 +1,143 @@
+@using AutomatizarOs.Core.Enums
+@using AutomatizarOs.Core.Handlers
+@using AutomatizarOs.Core.Models
+@using AutomatizarOs.Core.Requests.ServiceOrderRequests
+
+<MudDialog>
+    <TitleContent>
+        <h2 class="font-extrabold text-lg lg:text-2xl font-sans text-[#750303]">ADICIONAR RESPOSTA OS: @ServiceOrder.Id</h2>
+    </TitleContent>
+    <DialogContent>
+        <div class="flex flex-col w-full gap-3 border-t border-b border-[#dfdfdf] my-4">
+            <h2 class="font-bold text-lg font-sans text-[#750303] mt-3 mb-3 uppercase">EMPRESA: @ServiceOrder.EEnterprise</h2>
+        </div>
+        <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
+            <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3">DADOS DO CLIENTE</h2>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">NOME:</span> @ServiceOrder.Customer.Name</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">ENDEREÇO:</span> @ServiceOrder.Customer.Street, @ServiceOrder.Customer.Number, @ServiceOrder.Customer.Neighborhood</p>
+            <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">TELEFONE:</span> @ServiceOrder.Customer.Phone</p>
+        </div>
+        <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
+            <h2 class="font-bold text-lg font-sans text-[#750303] mt-3">DADOS DO PRODUTO</h2>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">TIPO:</span> @ServiceOrder.ProductType</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">MARCA:</span> @ServiceOrder.ProductBrand</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">MODELO:</span> @ServiceOrder.ProductModel</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SÉRIE:</span> @ServiceOrder.ProductSerialNumber</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">DEFEITO:</span> @ServiceOrder.ProductDefect</p>
+            <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">DATA DE ENTRADA:</span> @ServiceOrder.EntryDate.ToString("dd/MM/yyyy")</p>
+        </div>
+        <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
+            <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3">INFORMAÇÕES SOBRE O ORÇAMENTO</h2>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SOLUÇÃO:</span> @ServiceOrder.Solution</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">VALOR:</span> @ServiceOrder.Amount</p>
+            <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">ORÇAMENTO FEITO EM:</span> @ServiceOrder.InspectionDate?.ToString("dd/MM/yyyy")</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SITUAÇÃO:</span> @Situacao</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">TEM CONSERTO?</span> @TemConserto</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">RESPOSTA DO CLIENTE:</span> @Resposta</p>
+        </div>
+        <div class="flex flex-row w-full gap-3 mb-[50px]">
+            <MudButton @onclick="Aprovado"
+                       Variant="Variant.Filled"
+                       Color="Color.Info"
+                       Class="text-white text-lg font-semibold py-2 px-5 rounded-lg transition">
+                Aprovado
+            </MudButton>
+            <MudButton @onclick="Reprovado"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Class="text-white text-lg font-semibold py-2 px-5 rounded-lg transition">
+                Reprovado
+            </MudButton>
+        </div>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public ServiceOrder ServiceOrder { get; set; } = new ();
+    [Parameter] public EventCallback OnResponseAdded { get; set; }
+    [Inject] public IServiceOrderHandler ServiceOrderHandler { get; set; } = null!;
+    [Inject] public ISnackbar Snackbar { get; set; } = null!;
+
+    public async Task Aprovado()
+    {
+        try
+        {
+            var request = new AddStatusByIdRequest
+            {
+                Id = ServiceOrder.Id,
+                Repair = ERepair.Approved
+            };
+
+            var result = await ServiceOrderHandler.AddStatusById(request);
+            if (result.IsSuccess)
+            {
+                Snackbar.Add("Resposta adicionada com sucesso!", Severity.Success);
+                await OnResponseAdded.InvokeAsync();
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+                Snackbar.Add(result.Message ?? "Ocorreu um erro ao adicionar uma resposta na OS", Severity.Error);
+            
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+    
+    public async Task Reprovado()
+    {
+        try
+        {
+            var request = new AddStatusByIdRequest
+            {
+                Id = ServiceOrder.Id,
+                Repair = ERepair.Disapproved
+            };
+
+            var result = await ServiceOrderHandler.AddStatusById(request);
+            if (result.IsSuccess)
+            {
+                Snackbar.Add("Resposta adicionada com sucesso!", Severity.Success);
+                await OnResponseAdded.InvokeAsync();
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            else
+                Snackbar.Add(result.Message ?? "Ocorreu um erro ao adicionar uma resposta na OS", Severity.Error);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+    
+    public string Situacao =>
+        ServiceOrder.EServiceOrderStatus switch
+        {
+            EServiceOrderStatus.Entered => "Avaliação pendente",
+            EServiceOrderStatus.Evaluated => "Avaliado",
+            EServiceOrderStatus.Repaired => "Consertado",
+            EServiceOrderStatus.Delivered => "Entregue",
+            _ => "Desconhecido"
+        };
+    
+    public string TemConserto =>
+        ServiceOrder.EUnrepaired switch
+        {
+            EUnrepaired.Repair => "Sim",
+            EUnrepaired.Unrepaired => "Não",
+            EUnrepaired.NoDefectFound => "Não apresentou defeito",
+            _ => "Desconhecido"
+        };
+    
+    public string Resposta =>
+        ServiceOrder.ERepair switch
+        {
+            ERepair.Entered => "Sem orçamento ainda",
+            ERepair.Waiting => "Aguardando resposta",
+            ERepair.Approved => "Aprovado",
+            ERepair.Disapproved => "Não aprovou",
+            _ => "Desconhecido"
+        };
+}
