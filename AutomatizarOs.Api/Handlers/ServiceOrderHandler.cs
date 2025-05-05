@@ -245,4 +245,22 @@ public class ServiceOrderHandler : IServiceOrderHandler
             return new Response<bool>(false, 500, e.Message);
         }
     }
+    
+    public async Task<Response<ServiceOrder?>> GetCloudServiceOrder(long id)
+    {
+        try
+        {
+            var serviceOrder = await _serviceOrderRepository.GetServiceOrderById(id);
+            
+            if (serviceOrder == null)
+                return new Response<ServiceOrder?>(null, 404, "Nenhuma ordem de serviço foi encontrada.");
+
+            return new Response<ServiceOrder?>(serviceOrder, 200, "Ordem de servico obtida com sucesso!");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro inesperado: {ex}");
+            return new Response<ServiceOrder?>(null, 500, "Erro interno no servidor");
+        }
+    }
 }

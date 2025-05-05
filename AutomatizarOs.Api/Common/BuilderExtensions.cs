@@ -16,7 +16,7 @@ public static class BuilderExtensions
     public static void AddDbConfiguration(this WebApplicationBuilder builder)
     {
         builder.Services.AddDbContext<AutomatizarDbContext>(options =>
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
     }
     
     public static void AddJwtConfiguration(this WebApplicationBuilder builder)

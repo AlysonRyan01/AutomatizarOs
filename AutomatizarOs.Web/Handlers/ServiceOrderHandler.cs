@@ -138,4 +138,24 @@ public class ServiceOrderHandler : IServiceOrderHandler
             return HttpExceptionHandler.Handle<bool>(ex);
         }
     }
+
+    public async Task<Response<ServiceOrder?>> GetCloudServiceOrder(long id)
+    {
+        try
+        {
+            var result = await _httpClient.GetFromJsonAsync<Response<ServiceOrder>>($"v1/ServiceOrder/{id}");
+
+            if (result == null)
+                return new Response<ServiceOrder?>(null, 500, "Erro no servidor");
+            
+            if (!result.IsSuccess)
+                return new Response<ServiceOrder?>(null, 500, result.Message);
+            
+            return new Response<ServiceOrder?>(result.Data, 200, "Sucesso ao obter a ordem de servico");
+        }
+        catch (Exception ex)
+        {
+            return HttpExceptionHandler.Handle<ServiceOrder?>(ex);
+        }
+    }
 }

@@ -25,7 +25,9 @@
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">MODELO:</span> @ServiceOrder.ProductModel</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">SÉRIE:</span> @ServiceOrder.ProductSerialNumber</p>
             <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">DEFEITO:</span> @ServiceOrder.ProductDefect</p>
-            <p class="font-normal uppercase font-sans mb-3"><span class="font-bold font-sans text-[#750303]">DATA DE ENTRADA:</span> @ServiceOrder.EntryDate.ToString("dd/MM/yyyy")</p>
+            <p class="font-normal uppercase font-sans"><span class="font-bold font-sans text-[#750303]">DATA DE ENTRADA:</span> @ServiceOrder.EntryDate.ToString("dd/MM/yyyy")</p>
+            <p class="font-normal uppercase font-sans mt-3"><span class="font-bold font-sans text-[#750303]">PRATELEIRA:</span> @ServiceOrder.Location</p>
+            <LocationButton ServiceOrder="ServiceOrder" OnLocationChanged="AtualizarPrateleira"></LocationButton>
         </div>
         <div class="flex flex-col w-full gap-3 border-b border-[#dfdfdf] my-4">
             <h2 class="font-bold uppercase text-lg font-sans text-[#750303] mt-3">INFORMAÇÕES SOBRE O ORÇAMENTO</h2>
@@ -104,4 +106,21 @@
             ERepair.Disapproved => "Não aprovou",
             _ => "Desconhecido"
         };
+    
+    private async Task AtualizarPrateleira()
+    {
+        var result = await ServiceOrderHandler.GetCloudServiceOrder(ServiceOrder.Id);
+        if (result.IsSuccess)
+        {
+            if (result.Data != null)
+            {
+                ServiceOrder.Location = result.Data.Location;
+                StateHasChanged();
+            }
+            else
+            {
+                Snackbar.Add("Ocorreu um erro ao obter a ordem de serviço", Severity.Error);
+            }
+        }
+    }
 }

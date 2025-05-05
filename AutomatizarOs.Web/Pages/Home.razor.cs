@@ -1,7 +1,9 @@
+using System.Text.RegularExpressions;
 using AutomatizarOs.Core.Enums;
 using AutomatizarOs.Core.Handlers;
 using AutomatizarOs.Core.Models;
 using AutomatizarOs.Web.Components;
+using AutomatizarOs.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
@@ -10,6 +12,8 @@ namespace AutomatizarOs.Web.Pages;
 
 public partial class Home : ComponentBase
 {
+    public string SearchOsNumber { get; set; } = string.Empty;
+    
     public List<ServiceOrder> ServiceOrders { get; set; } = new();
     public List<ServiceOrder> OrcamentosPendentes => ServiceOrders
         .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Entered && s.ERepair == ERepair.Entered).ToList();
@@ -26,6 +30,10 @@ public partial class Home : ComponentBase
     [Inject] public IServiceOrderHandler ServiceOrderHandler { get; set; } = null!;
     [Inject] public HubConnection HubConnection { get; set; } = null!;
     [Inject] public IDialogService DialogService { get; set; } = null!;
+    [Inject] public CustomAuthStateProvider AuthStateProvider { get; set; } = null!;
+    [Inject] public NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] public ISnackbar Snackbar { get; set; } = null!;
+
     
     protected override async Task OnInitializedAsync()
     {
@@ -169,5 +177,42 @@ public partial class Home : ComponentBase
         };
 
         await DialogService.ShowAsync<AddVerDialog>("Ver OS", parameters, options);
+    }
+    
+    private async Task ConsultarOs(string number)
+    {
+        try
+        {
+            var digitsOnly = Regex.Replace(number, "[^0-9]", "");
+            
+            if (!long.TryParse(digitsOnly, out var id))
+            {
+                Snackbar.Add("Número da OS inválido. Digite apenas números.", Severity.Error);
+                return;
+            }
+            
+            var result = await ServiceOrderHandler.GetCloudServiceOrder(id);
+            if (!result.IsSuccess)
+            {
+                Snackbar.Add($"Erro: {result.Message}", Severity.Error);
+                return;
+            }
+
+            if (result.Data == null)
+            {
+                Snackbar.Add("Nenhuma OS localizada.", Severity.Error);
+                return;
+            }
+            
+            var serviceOrder = result.Data;
+            
+            await AbrirDialogVer(serviceOrder);
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

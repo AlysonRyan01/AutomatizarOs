@@ -32,8 +32,8 @@
 .loading-progress {
     position: relative;
     display: block;
-    width: 8rem;
-    height: 8rem;
+    width: 400px;
+    height: 400px;
     margin: 20vh auto 1rem auto;
 }
 

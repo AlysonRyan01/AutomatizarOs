@@ -143,7 +143,7 @@ namespace AutomatizarOs.Api.Repositories
         {
             try
             {
-                var serviceOrder = await _context.ServiceOrders.FirstOrDefaultAsync(x => x.Id == id);
+                var serviceOrder = await _context.ServiceOrders.Include(x => x.Customer).AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
                 return serviceOrder ?? null;
             }

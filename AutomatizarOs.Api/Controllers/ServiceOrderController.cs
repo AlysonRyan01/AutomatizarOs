@@ -147,4 +147,24 @@ public class ServiceOrderController(IServiceOrderHandler handler) : ControllerBa
             return StatusCode(500, errorResponse);
         }
     }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> AddStatus(long id)
+    {
+        try
+        {
+            var result = await handler.GetCloudServiceOrder(id);
+            return result.IsSuccess ? Ok(result) : BadRequest(result);
+        }
+        catch (Exception e)
+        {
+            var errorResponse = new Response<string?>(
+                null, 
+                500, 
+                "Falha ao obter a ordem de serviço.");
+            
+            Console.WriteLine($"Erro ao obter a ordem de servico: {e}");
+            return StatusCode(500, errorResponse);
+        }
+    }
 }

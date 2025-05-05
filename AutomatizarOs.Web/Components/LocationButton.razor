@@ -1,0 +1,50 @@
+@using AutomatizarOs.Core.Handlers
+@using AutomatizarOs.Core.Models
+@using AutomatizarOs.Core.Requests.ServiceOrderRequests
+
+<div class="flex flex-col items-start lg:items-center lg:flex-row gap-1 w-[300px] justify-start lg:justify-center mb-8">
+    <MudTextField Label="Prateleira"
+                  @bind-Value="Request.Location"
+                  For="@(() => Request.Location)"
+                  Variant="Variant.Outlined"
+                  FullWidth="false"
+                  Class="max-w-[100px]"/>
+    
+    <MudButton @onclick="AdicionarPrateleira"
+               Variant="Variant.Text"
+               Color="Color.Primary"
+               FullWidth="false">
+        <p class="font-sans p-0 text-base font-bold">Adicionar</p>
+    </MudButton>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnLocationChanged { get; set; }
+    [Parameter] public ServiceOrder ServiceOrder { get; set; } = new ();
+    private AddLocationRequest Request { get; set; } = new();
+    [Inject] public IServiceOrderHandler ServiceOrderHandler { get; set; } = null!;
+    [Inject] public ISnackbar Snackbar { get; set; } = null!;
+
+    public async Task AdicionarPrateleira()
+    {
+        try
+        {
+            Request.Id = ServiceOrder.Id;
+            var result = await ServiceOrderHandler.AddLocation(Request);
+            if (result.IsSuccess)
+            {
+                Snackbar.Add("Prateleira adicionada com sucesso!", Severity.Success);
+                await OnLocationChanged.InvokeAsync();
+                Request.Location = string.Empty;
+            }
+            else
+            {
+                Snackbar.Add(result.Message?? "Erro ao adicionar a prateleira", Severity.Error);
+            }
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+    }
+}

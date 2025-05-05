@@ -1,4 +1,5 @@
-﻿<CascadingAuthenticationState>
+﻿@using AutomatizarOs.Web.Components
+<CascadingAuthenticationState>
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="routeData">
@@ -9,6 +10,7 @@
                 </Authorizing>
                 <NotAuthorized>
                     <h1>Você não tem acesso a esta funcionalidade</h1>
+                    <RedirectToLogin/>
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>

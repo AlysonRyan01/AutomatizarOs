@@ -129,10 +129,30 @@
                         <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount,00</p></MudTd>
                         <MudTd DataLabel="Data da Entrega"><p class="text-sm font-sans font-normal uppercase">@context.DeliveryDate?.ToString("dd/MM/yyyy")</p></MudTd>
                         <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogVer(context)" EndIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Filled" Color="Color.Primary">
-                                <p class="text-base">Ver</p>    
-                            </MudButton></MudTd>
+                            <p class="text-base">Ver</p>    
+                        </MudButton></MudTd>
                     </RowTemplate>
                 </MudTable>
+            </div>
+        </MudTabPanel>
+        <MudTabPanel Text="CONSULTAR OS">
+            <div class="w-full min-h-[80vh] flex items-center justify-center">
+                <div class="flex flex-col lg:flex-row gap-2">
+                    <MudTextField Label="Ordem de serviço"
+                                     @bind-Value="SearchOsNumber"
+                                     For="@(() => SearchOsNumber)"
+                                     Variant="Variant.Outlined"
+                                     Class="min-w-[100px]"/>
+
+                    <MudButton OnClick="() => ConsultarOs(SearchOsNumber)"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               FullWidth="false"
+                               EndIcon="@Icons.Material.Filled.Visibility">
+                        <p class="font-sans p-0 text-base font-bold">Consultar</p>
+                    </MudButton>
+                </div>
             </div>
         </MudTabPanel>
     </MudTabs>

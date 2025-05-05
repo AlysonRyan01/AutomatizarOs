@@ -5,11 +5,9 @@ using AutomatizarOs.Web;
 using AutomatizarOs.Web.Handlers;
 using AutomatizarOs.Web.Services;
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.JSInterop.Infrastructure;
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
