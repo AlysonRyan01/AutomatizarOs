@@ -35,31 +35,67 @@ public class ServiceOrderHandler : IServiceOrderHandler
             var serviceOrdersIds = serviceOrders.Select(c => c.Id).ToList();
 
             var existingIds = await _context.ServiceOrders
-                .Where(c => serviceOrdersIds.Contains(c.Id))
-                .Select(c => c.Id)
+                .Where(so => serviceOrdersIds.Contains(so.Id))
+                .Select(so => so.Id)
                 .ToListAsync();
 
             var newServiceOrders = serviceOrders.Where(c => !existingIds.Contains(c.Id)).ToList();
             
+            if (!newServiceOrders.Any())
+            {
+                Console.WriteLine("Todas as ordens já existem no banco local");
+                return response;
+            }
+            
             var customerIds = newServiceOrders
-                .Select(o => o.Customer.CustId)
+                .Select(o => o.CustomerId)
                 .Distinct()
                 .ToList();
             
-            var existingCustomers = await _context.Customers
+            var accessCustomers = await _serviceOrderRepository.GetActiveCustomer(customerIds);
+            
+            var existingCustomers  = await _context.Customers
                 .Where(c => customerIds.Contains(c.CustId))
-                .ToListAsync();
+                .ToDictionaryAsync(c => c.CustId);
 
             if (newServiceOrders.Any())
             {
                 response.Data = true;
                 foreach (var serviceOrder in newServiceOrders)
                 {
-                    var existingCustomer = existingCustomers.FirstOrDefault(x => x.CustId == serviceOrder.Customer.CustId);
-                    if (existingCustomer != null)
+                    if (!existingCustomers.TryGetValue(serviceOrder.CustomerId, out var customer))
                     {
-                        serviceOrder.Customer = existingCustomer;
-                        serviceOrder.CustomerId = existingCustomer.CustId;
+                        var accessCustomer = accessCustomers?.FirstOrDefault(c => c.CustId == serviceOrder.CustomerId);
+                        
+                        if (accessCustomer != null)
+                        {
+                            customer = new Customer
+                            {
+                                CustId = serviceOrder.CustomerId,
+                                Name = serviceOrder.Customer.Name,
+                                Street = serviceOrder.Customer.Street,
+                                Neighborhood = serviceOrder.Customer.Neighborhood,
+                                City = serviceOrder.Customer.City,
+                                Number = serviceOrder.Customer.Number,
+                                ZipCode = serviceOrder.Customer.ZipCode,
+                                StateCode = serviceOrder.Customer.StateCode,
+                                Landline = serviceOrder.Customer.Landline,
+                                Phone = serviceOrder.Customer.Phone,
+                                Email = serviceOrder.Customer.Email
+                            };
+                            _context.Customers.Add(customer);
+                            existingCustomers.Add(customer.CustId, customer);
+                        }
+                    }
+                    if (customer != null)
+                    {
+                        serviceOrder.CustomerId = customer.CustId;
+                        serviceOrder.Customer = customer;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Cliente {serviceOrder.CustomerId} não encontrado para a ordem {serviceOrder.Id}");
+                        serviceOrder.CustomerId = 0;
                     }
                 }
                 

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Iptv.Api.Data.Mappings.Identity;
+namespace AutomatizarOs.Api.Data.Mappings.Identity;
 
 public class IdentityRoleMapping
     : IEntityTypeConfiguration<IdentityRole<long>>

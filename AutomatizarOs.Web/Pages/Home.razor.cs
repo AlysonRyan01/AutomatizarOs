@@ -16,15 +16,28 @@ public partial class Home : ComponentBase
     
     public List<ServiceOrder> ServiceOrders { get; set; } = new();
     public List<ServiceOrder> OrcamentosPendentes => ServiceOrders
-        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Entered && s.ERepair == ERepair.Entered).ToList();
+        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Entered && s.ERepair == ERepair.Entered)
+        .OrderBy(s => s.Id)
+        .ToList();
     public List<ServiceOrder> AguardandoResposta => ServiceOrders
-        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Evaluated && s.ERepair == ERepair.Waiting).ToList();
+        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Evaluated && s.ERepair == ERepair.Waiting)
+        .OrderBy(s => s.Id)
+        .ToList();
     public List<ServiceOrder> AguardandoPeca => ServiceOrders
-        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Evaluated && s.ERepair == ERepair.Approved).ToList();
+        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Evaluated && s.ERepair == ERepair.Approved)
+        .OrderBy(s => s.Id)
+        .ToList();
     public List<ServiceOrder> AguardandoColeta => ServiceOrders
-        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Repaired || (s.EServiceOrderStatus == EServiceOrderStatus.Evaluated && (s.ERepair == ERepair.Disapproved || s.EUnrepaired == EUnrepaired.Unrepaired || s.EUnrepaired == EUnrepaired.NoDefectFound))).ToList();
+        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Repaired || 
+                    (s.EServiceOrderStatus == EServiceOrderStatus.Evaluated && 
+                     (s.ERepair == ERepair.Disapproved || s.EUnrepaired == EUnrepaired.Unrepaired || s.EUnrepaired == EUnrepaired.NoDefectFound)))
+        .OrderBy(s => s.Id)
+        .ToList();
     public List<ServiceOrder> Entregues => ServiceOrders
-        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Delivered).ToList();
+        .Where(s => s.EServiceOrderStatus == EServiceOrderStatus.Delivered)
+        .OrderBy(s => s.Id)
+        .ToList();
+
         
     
     [Inject] public IServiceOrderHandler ServiceOrderHandler { get; set; } = null!;

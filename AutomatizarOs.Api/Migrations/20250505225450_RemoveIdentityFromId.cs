@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AutomatizarOs.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class v : Migration
+    public partial class RemoveIdentityFromId : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,17 +15,17 @@ namespace AutomatizarOs.Api.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Street = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Neighborhood = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    City = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Number = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    ZipCode = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    StateCode = table.Column<string>(type: "TEXT", maxLength: 2, nullable: false),
-                    Landline = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Neighborhood = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    City = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Number = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    ZipCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    StateCode = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
+                    Landline = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -36,11 +36,11 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityRole",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,11 +51,11 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityRoleClaim",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<long>(type: "bigint", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -66,22 +66,22 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityUser",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 180, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 180, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 180, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 180, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserName = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,14 +92,13 @@ namespace AutomatizarOs.Api.Migrations
                 name: "ServiceOrders",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    Id = table.Column<long>(type: "bigint", nullable: false),
                     ServiceOrderStatus = table.Column<int>(type: "INT", nullable: false),
                     Enterprise = table.Column<int>(type: "INT", nullable: false),
                     ProductType = table.Column<int>(type: "INT", nullable: false),
-                    ProductBrand = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    ProductModel = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    ProductSerialNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    ProductBrand = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ProductModel = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ProductSerialNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     ProductDefect = table.Column<string>(type: "text", nullable: false),
                     Solution = table.Column<string>(type: "text", nullable: true),
                     Amount = table.Column<decimal>(type: "MONEY", nullable: true),
@@ -107,11 +106,12 @@ namespace AutomatizarOs.Api.Migrations
                     InspectionDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     RepairDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     DeliveryDate = table.Column<DateTime>(type: "datetime", nullable: true),
-                    CustomerId = table.Column<long>(type: "INTEGER", nullable: false),
+                    CustomerId = table.Column<long>(type: "bigint", nullable: false),
                     RepairStatus = table.Column<int>(type: "INT", nullable: false),
                     UnrepairedStatus = table.Column<int>(type: "INT", nullable: false),
                     PartCost = table.Column<decimal>(type: "MONEY", nullable: false),
-                    LaborCost = table.Column<decimal>(type: "MONEY", nullable: false)
+                    LaborCost = table.Column<decimal>(type: "MONEY", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -128,11 +128,11 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityClaim",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -149,10 +149,10 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityUserLogin",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    UserId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -169,8 +169,8 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityUserRole",
                 columns: table => new
                 {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    RoleId = table.Column<long>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    RoleId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -187,10 +187,10 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IdentityUserToken",
                 columns: table => new
                 {
-                    UserId = table.Column<long>(type: "INTEGER", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", maxLength: 120, nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 180, nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(180)", maxLength: 180, nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -212,19 +212,22 @@ namespace AutomatizarOs.Api.Migrations
                 name: "IX_IdentityRole_NormalizedName",
                 table: "IdentityRole",
                 column: "NormalizedName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IdentityUser_NormalizedEmail",
                 table: "IdentityUser",
                 column: "NormalizedEmail",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedEmail] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IdentityUser_NormalizedUserName",
                 table: "IdentityUser",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IdentityUserLogin_UserId",

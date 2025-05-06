@@ -14,7 +14,7 @@ namespace AutomatizarOs.Api.Repositories
     public class ServiceOrderRepository : IServiceOrderRepository
     {
         private readonly AutomatizarDbContext _context;
-        private static readonly string ConnectionString = @"Provider=Microsoft.ACE.OLEDB.16.0;Data Source=C:\sisos\os.mdb;";
+        private static readonly string ConnectionString = ApiConfiguration.AccessConnection;
 
         public ServiceOrderRepository(AutomatizarDbContext context)
         {
@@ -48,39 +48,17 @@ namespace AutomatizarOs.Api.Repositories
                     os.os_concerto AS eRepair,
                     os.os_semconserto AS eUnrepaired,
                     os.os_valpeca AS partCost,
-                    os.os_valmo AS laborCost,
-
-                    cli.cli_codigo AS [CustId],
-                    cli.cli_nome AS [Name],
-                    cli.cli_endereco AS [Street],
-                    cli.cli_bairro AS [Neighborhood],
-                    cli.cli_cidade AS [City],
-                    cli.cli_numero AS [Number],
-                    cli.cli_cep AS [ZipCode],
-                    cli.cli_uf AS [StateCode],
-                    cli.cli_telefone AS [Landline],
-                    cli.cli_celular AS [Phone],
-                    cli.cli_email AS [Email]
-
-                FROM cliente cli
-                INNER JOIN os ON os.cli_codigo = cli.cli_codigo
+                    os.os_valmo AS laborCost
+                FROM os
                 WHERE os.os_codigo IN (
-                    SELECT TOP 10 os_codigo
+                    SELECT TOP 100 os_codigo
                     FROM os
                     WHERE os_situacao <> 4
                     ORDER BY os_codigo DESC
                 )
                 ORDER BY os.os_codigo DESC";
 
-                var serviceOrders = (await connection.QueryAsync<ServiceOrder, Customer, ServiceOrder>(
-                    query,
-                    (os, customer) =>
-                    {
-                        os.Customer = customer;
-                        return os;
-                    },
-                    splitOn: "CustomerId"
-                )).ToList();
+                var serviceOrders = (await connection.QueryAsync<ServiceOrder>(query)).ToList();
 
                 return serviceOrders;
             }
@@ -284,6 +262,8 @@ namespace AutomatizarOs.Api.Repositories
             {
                 var serviceOrder = await _context
                 .ServiceOrders
+                .Include(x => x.Customer)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id && x.EServiceOrderStatus == EServiceOrderStatus.Evaluated);
 
                 if (serviceOrder == null)
@@ -444,6 +424,80 @@ namespace AutomatizarOs.Api.Repositories
             {
                 Console.WriteLine($"Erro inesperado: {ex}");
                 return false;
+            }
+        }
+
+        public async Task<List<Customer?>> GetActiveCustomer(List<long> customerIds)
+        {
+            var customers = new List<Customer>();
+            
+            if (customerIds == null || !customerIds.Any())
+                return customers;
+
+            try
+            {
+                using var connection = new OleDbConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                // Converter explicitamente para Int32 (que é o tipo mais compatível com Access)
+                var intIds = customerIds.Select(id => (int)id).ToList();
+
+                // Criar parâmetros com tipo explícito
+                var parameters = intIds.Select((id, i) => 
+                {
+                    var param = new OleDbParameter($"@p{i}", OleDbType.Integer);
+                    param.Value = id;
+                    return param;
+                }).ToList();
+
+                var paramNames = string.Join(",", parameters.Select(p => p.ParameterName));
+                
+                // Query simplificada sem aliases problemáticos
+                var query = $@"
+                    SELECT 
+                        cli_codigo,
+                        cli_nome,
+                        cli_endereco,
+                        cli_bairro,
+                        cli_cidade,
+                        cli_numero,
+                        cli_cep,
+                        cli_uf,
+                        cli_telefone,
+                        cli_celular,
+                        cli_email
+                    FROM cliente 
+                    WHERE cli_codigo IN ({paramNames})";
+
+                using var command = new OleDbCommand(query, connection);
+                command.Parameters.AddRange(parameters.ToArray());
+
+                using var reader = await command.ExecuteReaderAsync();
+                
+                while (await reader.ReadAsync())
+                {
+                    customers.Add(new Customer
+                    {
+                        CustId = Convert.ToInt64(reader["cli_codigo"]),
+                        Name = reader["cli_nome"] as string ?? "",
+                        Street = reader["cli_endereco"] as string ?? "",
+                        Neighborhood = reader["cli_bairro"] as string ?? "",
+                        City = reader["cli_cidade"] as string ?? "",
+                        Number = reader["cli_numero"] as string ?? "",
+                        ZipCode = reader["cli_cep"] as string ?? "",
+                        StateCode = reader["cli_uf"] as string ?? "",
+                        Landline = reader["cli_telefone"] as string ?? "",
+                        Phone = reader["cli_celular"] as string ?? "",
+                        Email = reader["cli_email"] as string ?? ""
+                    });
+                }
+                
+                return customers;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ERRO: {ex.Message}\nStack: {ex.StackTrace}");
+                return new List<Customer>();
             }
         }
     }

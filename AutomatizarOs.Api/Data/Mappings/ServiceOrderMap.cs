@@ -11,10 +11,10 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
         builder.ToTable("ServiceOrders");
         
         builder.HasKey(so => so.Id);
-        
+
         builder.Property(so => so.Id)
             .HasColumnName("Id")
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedNever();
 
         builder.Property(so => so.EServiceOrderStatus)
             .HasColumnName("ServiceOrderStatus")
@@ -58,7 +58,7 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
             
         builder.Property(so => so.Amount)
             .HasColumnName("Amount")
-            .HasColumnType("MONEY");
+            .HasColumnType("DECIMAL(10,2)");
         
         builder.Property(so => so.EntryDate)
             .HasColumnName("EntryDate")
@@ -78,11 +78,11 @@ public class ServiceOrderMap : IEntityTypeConfiguration<ServiceOrder>
         
         builder.Property(so => so.PartCost)
             .HasColumnName("PartCost")
-            .HasColumnType("MONEY");
+            .HasColumnType("DECIMAL(10,2)");
             
         builder.Property(so => so.LaborCost)
             .HasColumnName("LaborCost")
-            .HasColumnType("MONEY");
+            .HasColumnType("DECIMAL(10,2)");
         
         builder.Property(so => so.CustomerId)
             .HasColumnName("CustomerId");

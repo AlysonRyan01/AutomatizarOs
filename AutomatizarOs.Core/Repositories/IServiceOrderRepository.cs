@@ -15,5 +15,6 @@ namespace AutomatizarOs.Core.Repositories
         Task<bool> UpdateLocalServiceOrderBasic(ServiceOrder serviceOrder);
         Task<bool> UpdateDeliveryLocalServiceOrder(ServiceOrder serviceOrder);
         Task<bool> UpdateStatusLocalServiceOrder(ServiceOrder serviceOrder);
+        Task<List<Customer?>> GetActiveCustomer(List<long> customerIds);
     }
 }

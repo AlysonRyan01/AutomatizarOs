@@ -51,7 +51,7 @@
                         <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
                         <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
                         <MudTd DataLabel="Solução"><p class="text-sm font-sans font-normal uppercase">@context.Solution</p></MudTd>
-                        <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount,00</p></MudTd>
+                        <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount</p></MudTd>
                         <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogResposta(context)" EndIcon="@Icons.Material.Filled.Done" Variant="Variant.Filled" Color="Color.Primary">
                                 <p class="text-base">Resposta</p>
                             </MudButton></MudTd>
@@ -126,7 +126,7 @@
                         <MudTd DataLabel="Cliente"><p class="text-sm font-sans font-normal uppercase">@context.Customer.Name</p></MudTd>
                         <MudTd DataLabel="Modelo"><p class="text-sm font-sans font-normal uppercase">@context.ProductModel</p></MudTd>
                         <MudTd DataLabel="Solução"><p class="text-sm font-sans font-normal uppercase">@context.Solution</p></MudTd>
-                        <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount,00</p></MudTd>
+                        <MudTd DataLabel="Valor"><p class="text-sm font-sans font-normal uppercase">R$ @context.Amount</p></MudTd>
                         <MudTd DataLabel="Data da Entrega"><p class="text-sm font-sans font-normal uppercase">@context.DeliveryDate?.ToString("dd/MM/yyyy")</p></MudTd>
                         <MudTd DataLabel="Ação"><MudButton OnClick="() => AbrirDialogVer(context)" EndIcon="@Icons.Material.Filled.Visibility" Variant="Variant.Filled" Color="Color.Primary">
                             <p class="text-base">Ver</p>    
